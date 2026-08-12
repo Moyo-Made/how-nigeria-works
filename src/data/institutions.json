@@ -1,0 +1,348 @@
+[
+  {
+    "id": "national-assembly",
+    "name": "National Assembly",
+    "tagline": "Where the nation's laws are made",
+    "arm": "Legislature",
+    "tier": "Federal",
+    "model": "/models/national-assembly.glb",
+    "thumb": "/thumbs/national-assembly.webp",
+    "illustration": "/illustrations/national-assembly.webp",
+    "description": "The National Assembly is Nigeria's federal law-making body. It has two chambers, and both must agree before a bill can become law: the Senate, where every state has equal representation, and the House of Representatives, where seats are shared according to population. Beyond making laws, it approves how public money is spent and questions the Executive on how that money is used.",
+    "keyFacts": [
+      {
+        "label": "Chambers",
+        "value": "Senate + House of Representatives"
+      },
+      {
+        "label": "Senate",
+        "value": "109 senators — three per state, plus one for the FCT",
+        "source": "s. 48"
+      },
+      {
+        "label": "House of Representatives",
+        "value": "360 members, elected from federal constituencies",
+        "source": "s. 49"
+      },
+      {
+        "label": "Term",
+        "value": "4 years, with no limit on how many times a member may be re-elected",
+        "source": "s. 64(1)"
+      },
+      {
+        "label": "Led by",
+        "value": "President of the Senate; Speaker of the House of Representatives"
+      },
+      {
+        "label": "Current leadership",
+        "value": "Godswill Akpabio, President of the Senate; Tajudeen Abbas, Speaker of the House of Representatives",
+        "asOf": "August 2026"
+      },
+      {
+        "label": "Core function",
+        "value": "Makes federal laws, approves the budget, checks the Executive"
+      },
+      {
+        "label": "Located",
+        "value": "Three Arms Zone, Abuja"
+      }
+    ],
+    "whyItMatters": "Almost every national rule that shapes daily life begins here — taxes, education policy, road funding, the security budget. Your senator and your representative are the two people in Abuja you elected directly to speak for your area, and the ones you can hold to account at the next election.",
+    "checksOnIt": "A bill the Assembly passes is not yet law: it needs the President's assent, and if assent is withheld the Assembly must pass it again by a two-thirds majority in each chamber. Whatever it does pass can still be struck down by the courts if it conflicts with the Constitution.",
+    "didYouKnow": "The two chambers are known by their colours. The Senate sits in the Red Chamber and the House of Representatives in the Green Chamber, and both are served by a central atrium beneath the famous green dome.",
+    "inYourDailyLife": "When the Assembly passes the annual budget, it decides how much goes to the federal roads, hospitals and schools in your state — and it makes the law governing how money from the Federation Account is shared with your State and your Local Government.",
+    "hotspots": [
+      {
+        "id": "senate",
+        "label": "The Senate (Red Chamber)",
+        "blurb": "109 senators. Every state sends three, regardless of size, so a small state has the same voice here as a large one. The Red Chamber is inside the central building, on the eastern side of the atrium.",
+        "position": [
+          -0.34,
+          0.62,
+          0.12
+        ]
+      },
+      {
+        "id": "house",
+        "label": "House of Representatives (Green Chamber)",
+        "blurb": "360 members elected from federal constituencies drawn by population, so busier areas hold more seats. The Green Chamber is in the same central building, on the western side of the atrium.",
+        "position": [
+          0.34,
+          0.62,
+          0.12
+        ]
+      },
+      {
+        "id": "dome",
+        "label": "The Green Dome",
+        "blurb": "The landmark of the complex. Beneath it runs the central atrium that both chambers open onto — which is why the whole National Assembly is pictured by this one roof.",
+        "position": [
+          0,
+          0.98,
+          0.2
+        ]
+      },
+      {
+        "id": "wings",
+        "label": "The wing buildings",
+        "blurb": "Two five-storey wings flank the domed building, added years after it, giving the Senate and the House the offices and workrooms the chambers themselves have no space for.",
+        "position": [
+          0.56,
+          0.5,
+          0.05
+        ]
+      }
+    ],
+    "animation": "bill-to-law",
+    "status": "complete",
+    "modelNote": "The model is a schematic, not a floor plan. Markers point at the part of the building that houses each thing, not its exact room."
+  },
+  {
+    "id": "aso-rock-villa",
+    "name": "Aso Rock Villa",
+    "tagline": "Where the nation's laws are carried out",
+    "arm": "Executive",
+    "tier": "Federal",
+    "model": "/models/aso-rock-villa.glb",
+    "thumb": "/thumbs/aso-rock-villa.webp",
+    "illustration": "/illustrations/aso-rock-villa.webp",
+    "description": "Aso Rock Villa is the official residence and office of the President, and the seat of the Executive arm. The Executive's job is to carry out the laws the National Assembly passes: running the ministries, commanding the armed forces, conducting relations with other countries and proposing the annual budget. The President is both Head of State and Head of Government, and is elected directly by voters across the whole country.",
+    "keyFacts": [
+      {
+        "label": "Head of the Executive",
+        "value": "The President — Head of State, Head of Government and Commander-in-Chief"
+      },
+      {
+        "label": "Deputy",
+        "value": "The Vice President"
+      },
+      {
+        "label": "Term",
+        "value": "4 years, renewable once — a maximum of two terms",
+        "source": "ss. 135(2), 137(1)(b)"
+      },
+      {
+        "label": "Cabinet",
+        "value": "The Federal Executive Council, made up of ministers"
+      },
+      {
+        "label": "Ministers",
+        "value": "At least one from every state, appointed by the President and confirmed by the Senate",
+        "source": "s. 147(2)-(3)"
+      },
+      {
+        "label": "Current President",
+        "value": "Bola Ahmed Tinubu",
+        "asOf": "August 2026"
+      },
+      {
+        "label": "Core function",
+        "value": "Implements the laws, runs the ministries, proposes the budget"
+      },
+      {
+        "label": "Located",
+        "value": "Three Arms Zone, Abuja"
+      }
+    ],
+    "whyItMatters": "The Executive is the arm you meet most often, even if you never see the President. Every ministry, agency, police officer and passport office acts on its authority. It also proposes the budget, so its priorities shape what actually gets funded.",
+    "checksOnIt": "The President cannot spend money the National Assembly has not appropriated, and cannot seat a minister the Senate has not confirmed. The courts can rule an executive action unlawful. And a President can be removed for gross misconduct — but only through a chain that runs across all three arms: two-thirds of each chamber must vote to investigate, a seven-member panel appointed by the Chief Justice must find the allegation proved, and two-thirds of each chamber must then vote to remove.",
+    "didYouKnow": "The Villa takes its name from Aso Rock, the granite monolith rising directly behind it — one of the few seats of government in the world identified by a natural landmark rather than by the building itself.",
+    "inYourDailyLife": "Your passport, your national identity number, the body that approves the medicines in your pharmacy, the duty charged on goods brought into the country — all sit with federal ministries and agencies that answer to the Presidency.",
+    "hotspots": [
+      {
+        "id": "presidents-office",
+        "label": "The President's Office",
+        "blurb": "Where the President works, and where a bill arrives from the National Assembly to be assented to — or not.",
+        "position": [
+          -0.41,
+          0.42,
+          -0.05
+        ]
+      },
+      {
+        "id": "council-chamber",
+        "label": "Council Chamber",
+        "blurb": "Where the Federal Executive Council — the President, Vice President and ministers — meets to take decisions together.",
+        "position": [
+          0,
+          0.56,
+          -0.09
+        ]
+      },
+      {
+        "id": "aso-rock",
+        "label": "Aso Rock",
+        "blurb": "The granite monolith behind the Villa that gives the complex its name.",
+        "position": [
+          0.07,
+          0.71,
+          -0.7
+        ]
+      },
+      {
+        "id": "forecourt",
+        "label": "The Forecourt",
+        "blurb": "Where visiting heads of state are formally received, and where national ceremonies are held.",
+        "position": [
+          0,
+          0.08,
+          0.46
+        ]
+      }
+    ],
+    "animation": null,
+    "status": "complete",
+    "modelNote": "The model is a schematic, not a floor plan. Markers point at the part of the building that houses each thing, not its exact room."
+  },
+  {
+    "id": "supreme-court",
+    "name": "Supreme Court of Nigeria",
+    "tagline": "Where the law has the final word",
+    "arm": "Judiciary",
+    "tier": "Federal",
+    "model": "/models/supreme-court.glb",
+    "thumb": "/thumbs/supreme-court.webp",
+    "illustration": "/illustrations/supreme-court.webp",
+    "description": "The Supreme Court is the highest court in Nigeria. It hears appeals from the Court of Appeal and its decisions are final — no other court can overturn them. It also settles disputes between the Federal Government and a state, or between two states, and it has the last word on what the Constitution means. Its role is to check both the Legislature and the Executive by ruling on whether what they have done is lawful.",
+    "keyFacts": [
+      {
+        "label": "Highest court",
+        "value": "Its decisions are final and bind every other court"
+      },
+      {
+        "label": "Composition",
+        "value": "The Chief Justice of Nigeria and up to 21 other Justices",
+        "source": "s. 230(2)"
+      },
+      {
+        "label": "Appointed by",
+        "value": "The President, on the recommendation of the National Judicial Council, subject to Senate confirmation"
+      },
+      {
+        "label": "Security of tenure",
+        "value": "A Justice cannot be dismissed at will, and only for inability to do the job, misconduct or breach of the Code of Conduct. Removing the Chief Justice takes an address supported by two-thirds of the Senate; any other Justice goes on the recommendation of the National Judicial Council.",
+        "source": "s. 292(1)"
+      },
+      {
+        "label": "Retirement age",
+        "value": "A Justice may retire at 65 and must leave office at 70",
+        "source": "s. 291(1)"
+      },
+      {
+        "label": "Sits in panels",
+        "value": "Never the whole court at once — no fewer than five Justices, and seven where it interprets the Constitution, rules on fundamental rights, or hears a case in its original jurisdiction",
+        "source": "s. 234"
+      },
+      {
+        "label": "Original jurisdiction",
+        "value": "Disputes between the Federation and a state, or between states",
+        "source": "s. 232"
+      },
+      {
+        "label": "Current Chief Justice",
+        "value": "Honourable Justice Kudirat Motonmori Olatokunbo Kekere-Ekun, GCON",
+        "asOf": "August 2026"
+      },
+      {
+        "label": "Located",
+        "value": "Three Arms Zone, Abuja"
+      }
+    ],
+    "whyItMatters": "This is where an ordinary citizen can, in principle, defeat the government. If a law or an official action breaches your constitutional rights, this is the court that can strike it down — and neither the President nor the National Assembly can overrule it.",
+    "checksOnIt": "The court cannot act on its own initiative — it decides only the cases actually brought before it, and decides them on the law rather than on what it thinks best. Its Justices are appointed by the President on the recommendation of the National Judicial Council and confirmed by the Senate, and the National Assembly can rewrite the ordinary law the court applies, though changing the Constitution itself takes a formal amendment. The trade is deliberate: in exchange, a Justice cannot be sacked for a ruling the government dislikes.",
+    "didYouKnow": "Nigeria's highest court only became truly final in 1963. Before then, cases could still be appealed beyond Nigeria to the Judicial Committee of the Privy Council in London.",
+    "inYourDailyLife": "Its rulings settle what the rules actually mean — who legitimately holds an office after a disputed election, whether a tax or a levy was lawfully imposed, and how far the police may go. Every lower court that hears an ordinary case is bound by what it decides.",
+    "hotspots": [
+      {
+        "id": "courtroom",
+        "label": "The courtroom",
+        "blurb": "Where the Justices sit as a panel to hear appeals. No witnesses and no new evidence — only argument about what the law means. Each Justice may give their own reasons, and the view of the majority binds every other court.",
+        "position": [
+          0,
+          0.58,
+          -0.14
+        ]
+      },
+      {
+        "id": "coat-of-arms",
+        "label": "The Coat of Arms",
+        "blurb": "Mounted above the entrance, marking the court as an institution of the Federal Republic rather than of any government of the day.",
+        "position": [
+          0,
+          0.46,
+          0.24
+        ]
+      },
+      {
+        "id": "forecourt",
+        "label": "Forecourt and Steps",
+        "blurb": "The public approach to the court — the point at which a dispute stops being political and becomes a legal question.",
+        "position": [
+          0,
+          0.09,
+          0.6
+        ]
+      }
+    ],
+    "animation": null,
+    "status": "complete",
+    "modelNote": "The model is a schematic, not a floor plan. Markers point at the part of the building that houses each thing, not its exact room."
+  },
+  {
+    "id": "state-house-of-assembly",
+    "name": "State House of Assembly",
+    "tagline": "Law-making at the state level",
+    "arm": "Legislature",
+    "tier": "State",
+    "model": "/models/state-house-of-assembly.glb",
+    "thumb": "/thumbs/state-house-of-assembly.webp",
+    "illustration": null,
+    "description": null,
+    "keyFacts": [],
+    "whyItMatters": null,
+    "checksOnIt": null,
+    "didYouKnow": null,
+    "inYourDailyLife": null,
+    "hotspots": [],
+    "animation": null,
+    "status": "placeholder"
+  },
+  {
+    "id": "lga-secretariat",
+    "name": "LGA Secretariat",
+    "tagline": "The tier of government closest to you",
+    "arm": "Executive",
+    "tier": "Local Government",
+    "model": "/models/lga-secretariat.glb",
+    "thumb": "/thumbs/lga-secretariat.webp",
+    "illustration": null,
+    "description": null,
+    "keyFacts": [],
+    "whyItMatters": null,
+    "checksOnIt": null,
+    "didYouKnow": null,
+    "inYourDailyLife": null,
+    "hotspots": [],
+    "animation": null,
+    "status": "placeholder"
+  },
+  {
+    "id": "inec",
+    "name": "INEC",
+    "tagline": "Who runs the elections",
+    "arm": "Independent Commission",
+    "tier": "Federal",
+    "model": "/models/inec.glb",
+    "thumb": "/thumbs/inec.webp",
+    "illustration": null,
+    "description": null,
+    "keyFacts": [],
+    "whyItMatters": null,
+    "checksOnIt": null,
+    "didYouKnow": null,
+    "inYourDailyLife": null,
+    "hotspots": [],
+    "animation": null,
+    "status": "placeholder"
+  }
+]

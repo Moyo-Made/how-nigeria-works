@@ -1,0 +1,1053 @@
+:root {
+  /* Night green, layered rather than flat: the well is the deepest surface and
+     the rail and panel sit above it, so the specimen reads as set into a tray
+     rather than floating in a void. */
+  --paper: #0b2117;
+  --paper-raised: #122c1f;
+  --paper-sunk: #1b3a28;
+
+  --ink: #eef3ec;
+  --ink-2: #b6c5ba;
+  --ink-3: #7d8d82;
+
+  --green: #46c78c; /* lifted to stay readable as text on night green */
+  --green-fill: #00784a; /* filled controls — dark enough to carry light text */
+  --green-bright: #008751; /* the flag exactly, for fills and the 3D scene */
+  --green-pale: rgba(70, 199, 140, 0.13);
+
+  --well: #05120c;
+  --well-2: #0a2015;
+
+  /* Anything that sits inside the well keeps its own light values, so the well
+     never has to follow the shell. */
+  --on-well: #eef3ec;
+  --on-well-dim: rgba(238, 243, 236, 0.6);
+
+  --brass: #d2a93c; /* the coat of arms, brightened to carry on a dark ground */
+  --indigo: #8fb2cd; /* adire — the secondary that is not simply more green */
+
+  --line: rgba(238, 243, 236, 0.11);
+  --line-strong: rgba(238, 243, 236, 0.22);
+
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+
+  --r-sm: 4px;
+  --r-md: 10px;
+  --r-lg: 18px;
+
+  --rail: 252px;
+  --panel: 384px;
+  --gap: 16px;
+
+  color-scheme: dark;
+  font-family: var(--font-text);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  overscroll-behavior-y: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Labels, citations and section heads all share one voice: the small tracked
+   caps of a printed document's running heads. */
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.btn {
+  padding: 9px 16px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  transition: background 0.16s, border-color 0.16s;
+}
+
+.btn:hover {
+  background: var(--paper);
+  border-color: var(--green);
+}
+
+/* ---------- the confluence mark ----------
+   The white Y on the national coat of arms: the Niger and the Benue meeting.
+   It is also the shape of the legislature — two chambers becoming one law —
+   which is why it recurs as the bill-to-law track. */
+
+.confluence {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.confluence path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+/* ---------- shell ---------- */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 var(--gap);
+  height: 58px;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--green);
+}
+
+.wordmark span {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.topbar-spacer {
+  flex: 1;
+}
+
+.topbar-note {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* Three columns that persist: pick from the rail, look at the well, read the
+   panel. Nothing navigates away, so you never lose your place. */
+.workspace {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr) var(--panel);
+  gap: var(--gap);
+  padding: var(--gap);
+  align-items: start;
+}
+
+.col-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 2px 10px;
+}
+
+/* ---------- rail ---------- */
+
+.rail {
+  position: sticky;
+  top: calc(58px + var(--gap));
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 58px - var(--gap) * 2);
+  padding: 14px 12px 12px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.rail-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+.rail-group + .rail-group {
+  margin-top: 16px;
+}
+
+.rail-group > .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px 7px;
+}
+
+.rail-group > .eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent, var(--green));
+}
+
+/* Lifted for a dark ground while keeping each arm its own hue. */
+[data-arm="legislature"] { --accent: #46c78c; }
+[data-arm="executive"] { --accent: #d2a93c; }
+[data-arm="judiciary"] { --accent: #8fb2cd; }
+[data-arm="commission"] { --accent: #b79ccb; }
+
+.rail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  background: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rail-item:hover {
+  background: var(--paper-sunk);
+}
+
+.rail-item[aria-current="true"] {
+  background: var(--green-pale);
+  border-color: color-mix(in srgb, var(--green) 32%, transparent);
+}
+
+.rail-thumb {
+  flex: none;
+  width: 46px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: var(--r-sm);
+  background: var(--paper-sunk);
+}
+
+.rail-item[aria-current="true"] .rail-thumb {
+  background: color-mix(in srgb, var(--green) 14%, transparent);
+}
+
+.rail-text {
+  min-width: 0;
+}
+
+.rail-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.rail-sub {
+  display: block;
+  margin-top: 1px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.rail-item[data-status="placeholder"] .rail-name,
+.rail-item[data-status="placeholder"] .rail-sub {
+  color: var(--ink-3);
+}
+
+.rail-foot {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* ---------- stage ---------- */
+
+.stage-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stage {
+  position: relative;
+  height: calc(100dvh - 58px - var(--gap) * 2 - 46px);
+  min-height: 380px;
+  overflow: hidden;
+  /* The deepest surface in the app: the rail and panel sit above it, so the
+     specimen reads as set into a tray rather than floating. */
+  background: radial-gradient(120% 90% at 50% 12%, var(--well-2), var(--well));
+  border-radius: var(--r-lg);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.stage canvas {
+  display: block;
+}
+
+.stage-tip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: rgba(240, 243, 238, 0.42);
+  pointer-events: none;
+}
+
+/* Controls sit on the paper below the well rather than floating over the
+   specimen — the tray stays clean and the tools live on the desk. */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+}
+
+.tool-group {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--ink-2);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tool:hover:not(:disabled) {
+  background: var(--paper-sunk);
+  color: var(--ink);
+}
+
+.tool[data-on] {
+  background: var(--green-fill);
+  color: var(--on-well);
+}
+
+.tool:disabled {
+  color: var(--ink-3);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.tool-icon {
+  padding: 6px;
+  width: 30px;
+  justify-content: center;
+}
+
+.icon {
+  width: 15px;
+  height: 15px;
+}
+
+.tool-spacer {
+  flex: 1;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 15px;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--on-well);
+  background: var(--green-fill);
+  border: 0;
+  border-radius: 999px;
+  transition: background 0.16s;
+}
+
+.cta:hover {
+  background: var(--green-bright);
+}
+
+.cta-play {
+  width: 0;
+  height: 0;
+  border-left: 7px solid currentColor;
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+}
+
+/* ---------- panel ---------- */
+
+.panel {
+  position: sticky;
+  top: calc(58px + var(--gap));
+  max-height: calc(100dvh - 58px - var(--gap) * 2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 22px 26px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.panel h1 {
+  margin: 7px 0 0;
+  font-size: 27px;
+  line-height: 1.1;
+}
+
+.panel-tagline {
+  margin: 7px 0 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--green);
+}
+
+.panel-lede {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+
+.panel-section {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.panel-section h2 {
+  margin-bottom: 11px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.panel-section p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+
+/* The two sections that carry the app's argument get a tinted card so they read
+   as a pair: what this arm can do, and what stops it. */
+.panel-section[data-tone] p {
+  padding: 13px 15px;
+  border-radius: var(--r-md);
+  color: var(--ink);
+}
+
+.panel-section[data-tone="power"] p {
+  background: var(--green-pale);
+}
+
+.panel-section[data-tone="check"] p {
+  background: color-mix(in srgb, var(--indigo) 14%, transparent);
+}
+
+.facts {
+  margin: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+}
+
+.fact dt {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.fact dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.fact-source {
+  margin-left: 7px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-style: normal;
+  letter-spacing: 0.03em;
+  color: var(--brass);
+  white-space: nowrap;
+}
+
+.fact-pending {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--brass);
+}
+
+.fact-pending::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--brass);
+  vertical-align: 1px;
+}
+
+.panel-note {
+  margin: 20px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+/* ---------- explore cards ---------- */
+
+.explore {
+  padding: 6px var(--gap) var(--gap);
+}
+
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--gap);
+}
+
+.ecard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 17px 15px;
+  text-align: left;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  transition: border-color 0.16s, transform 0.16s;
+}
+
+button.ecard:hover {
+  border-color: var(--accent, var(--green));
+  transform: translateY(-2px);
+}
+
+.ecard .eyebrow {
+  color: var(--accent, var(--green));
+}
+
+.ecard h3 {
+  font-size: 16px;
+  line-height: 1.22;
+}
+
+.ecard p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* Carries a card that has no heading of its own, so it takes the weight a
+   heading would have given it. */
+.ecard p.ecard-lead {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.ecard-go {
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--accent, var(--green));
+}
+
+.ecard-quote {
+  justify-content: center;
+  background: var(--green-pale);
+  border-color: transparent;
+}
+
+.ecard-quote p {
+  font-size: 16px;
+  line-height: 1.42;
+  color: var(--ink);
+}
+
+/* ---------- bill-to-law player ---------- */
+
+.player {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-caption {
+  max-width: 560px;
+  padding: 15px 20px 17px;
+  text-align: center;
+  background: color-mix(in srgb, var(--well) 78%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(240, 243, 238, 0.14);
+  border-radius: var(--r-md);
+  color: var(--on-well);
+}
+
+.player-caption .eyebrow {
+  color: var(--on-well-dim);
+}
+
+.player-caption h2 {
+  margin: 6px 0 7px;
+  font-size: 19px;
+  color: var(--on-well);
+}
+
+.player-caption p:last-child {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(240, 243, 238, 0.78);
+}
+
+/* The confluence: the Senate and the House run as two channels, meet where the
+   chambers harmonise, and continue as one law. The same figure as the Y on the
+   coat of arms, where the Niger and the Benue join. */
+.track {
+  width: 100%;
+  max-width: 560px;
+  height: 44px;
+  overflow: visible;
+}
+
+.track-channel {
+  fill: none;
+  stroke: rgba(240, 243, 238, 0.2);
+  stroke-width: 1.5;
+}
+
+.track-flow {
+  fill: none;
+  stroke: var(--green-bright);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.track-stop {
+  cursor: pointer;
+}
+
+.track-stop circle {
+  fill: var(--well);
+  stroke: rgba(240, 243, 238, 0.32);
+  stroke-width: 1.5;
+  transition: fill 0.25s, stroke 0.25s, r 0.2s;
+}
+
+.track-stop:hover circle {
+  stroke: var(--paper);
+}
+
+.track-stop[data-state="done"] circle {
+  fill: var(--green-bright);
+  stroke: var(--green-bright);
+}
+
+.track-stop[data-state="current"] circle {
+  fill: var(--paper);
+  stroke: var(--paper);
+}
+
+.track-label {
+  font-family: var(--font-display);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  fill: rgba(240, 243, 238, 0.42);
+}
+
+.player-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.player-buttons .tool {
+  color: rgba(240, 243, 238, 0.82);
+}
+
+.player-buttons .tool-group {
+  background: color-mix(in srgb, var(--well) 78%, transparent);
+  backdrop-filter: blur(12px);
+  border-color: rgba(240, 243, 238, 0.16);
+}
+
+.player-buttons .tool:hover:not(:disabled) {
+  background: rgba(240, 243, 238, 0.12);
+  color: var(--paper);
+}
+
+.player-buttons .tool:disabled {
+  color: rgba(240, 243, 238, 0.34);
+}
+
+/* ---------- hotspots ---------- */
+
+.hotspot {
+  position: relative;
+  transition: opacity 0.25s;
+  animation: fade-in 0.45s ease 0.5s backwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+.hotspot[data-behind="true"] {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.hotspot-dot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--well);
+  background: var(--on-well);
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.16s, background 0.16s, color 0.16s;
+}
+
+.hotspot-dot:hover {
+  transform: scale(1.14);
+}
+
+.hotspot[data-open] .hotspot-dot {
+  background: var(--green-bright);
+  color: var(--on-well);
+}
+
+@media (pointer: coarse) {
+  .hotspot-dot::after {
+    content: "";
+    position: absolute;
+    inset: -11px;
+    border-radius: 50%;
+  }
+}
+
+.hotspot-card {
+  position: absolute;
+  top: 50%;
+  left: 34px;
+  width: 250px;
+  padding: 14px 16px 15px;
+  transform: translateY(-50%);
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+
+.hotspot[data-side="left"] .hotspot-card {
+  left: auto;
+  right: 34px;
+}
+
+.hotspot-card h2 {
+  margin: 0 20px 6px 0;
+  font-size: 14px;
+  line-height: 1.28;
+}
+
+.hotspot-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.hotspot-close {
+  position: absolute;
+  top: 6px;
+  right: 9px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink-3);
+}
+
+.hotspot-close:hover {
+  color: var(--ink);
+}
+
+/* ---------- loading + placeholder ---------- */
+
+.stage-empty {
+  display: grid;
+  place-items: center;
+}
+
+.stage-plinth {
+  width: 190px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(240, 243, 238, 0.09);
+  animation: plinth-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes plinth-pulse {
+  50% { opacity: 0.4; }
+}
+
+.soon {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 32px;
+  text-align: center;
+  color: var(--on-well);
+}
+
+.soon .eyebrow {
+  color: rgba(240, 243, 238, 0.45);
+}
+
+.soon h2 {
+  margin: 8px 0 0;
+  font-size: 24px;
+  color: var(--on-well);
+}
+
+.soon p {
+  max-width: 340px;
+  margin: 10px auto 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(240, 243, 238, 0.62);
+}
+
+/* Marks — drawn on paper in the rail, so they carry their own light palette. */
+.mark {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mark-muted { opacity: 0.42; }
+
+.m-plinth { fill: rgba(238, 243, 236, 0.07); }
+.m-stone { fill: #cdd4c9; }
+.m-shade { fill: #a9b3a6; }
+.m-green { fill: #4f8f6c; }
+.m-brick { fill: #9c6a58; }
+.m-brick-dark { fill: #7a4e42; }
+.m-rock { fill: #6b6259; }
+.m-brass { fill: #9a7b1f; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1180px) {
+  :root { --rail: 208px; --panel: 330px; }
+}
+
+@media (max-width: 1000px) {
+  /* The rail becomes a horizontal filmstrip above the stage; panel drops under. */
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .rail {
+    position: static;
+    max-height: none;
+    padding: 10px;
+  }
+
+  .rail-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .rail-scroll::-webkit-scrollbar { display: none; }
+
+  .rail-group + .rail-group { margin-top: 0; }
+
+  .rail-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .rail-group > .eyebrow {
+    padding: 0;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+
+  /* Fixed width so the filmstrip has an even rhythm, and a two-line clamp so a
+     long name cannot set the height of the whole strip. */
+  .rail-item { width: 178px; flex: none; }
+
+  .rail-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .rail-sub { white-space: nowrap; }
+  .rail-foot { display: none; }
+
+  .panel {
+    position: static;
+    max-height: none;
+  }
+
+  .stage { height: 52dvh; min-height: 320px; }
+}
+
+@media (max-width: 640px) {
+  :root { --gap: 12px; }
+
+  .topbar { height: 52px; }
+  .topbar-note { display: none; }
+
+  .stage { height: 46dvh; min-height: 260px; }
+  .stage-tip { display: none; }
+
+  .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .toolbar::-webkit-scrollbar { display: none; }
+  .tool-group { flex: none; }
+  .tool-spacer { display: none; }
+
+  .player { left: 8px; right: 8px; bottom: 10px; gap: 8px; }
+  .player-caption { padding: 12px 14px 13px; }
+  .player-caption h2 { font-size: 17px; }
+  .player-caption p:last-child { font-size: 13px; }
+  .track { height: 38px; }
+
+  .fact { grid-template-columns: minmax(0, 1fr); gap: 1px; }
+  .panel { padding: 16px 15px 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-plinth,
+  .hotspot { animation: none; }
+  .ecard:hover,
+  .hotspot-dot:hover { transform: none; }
+  .track-flow { transition: none; }
+}
