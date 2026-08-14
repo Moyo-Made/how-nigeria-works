@@ -1,4 +1,8 @@
-# How Nigeria's Government Works
+# Three Arms
+
+*How Nigeria's government works.* The name is Abuja's Three Arms Zone — the district
+holding the Presidential Villa, the National Assembly and the Supreme Court, which are the
+three landmarks the app opens on.
 
 An interactive 3D explainer of Nigeria's federal government — the three arms, the three
 tiers, and how a bill becomes law. Each institution is presented as a landmark on a
@@ -32,7 +36,13 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build
 npm run lint
+npm run og       # redraw public/og.png from tools/og.html
+npm run icons    # redraw public/apple-touch-icon.png from public/favicon.svg
 ```
+
+`og` and `icons` shell out to headless Chrome, which is not a dependency — set
+`CHROME_PATH` if it is not in the usual place. Neither runs as part of `build`;
+the outputs are committed, so you only run them when the card or the mark changes.
 
 ## How it is put together
 
@@ -62,7 +72,9 @@ so prose reads like a document rather than UI.
 
 The mark is the confluence from the national coat of arms, where the Niger and the Benue
 meet. It recurs as the bill-to-law track: two chambers running as separate channels,
-joining at harmonisation, continuing as one law.
+joining at harmonisation, continuing as one law. The trunk is drawn heavier than the two
+arms, because two rivers arrive and one leaves. On a flag-green tile it is the favicon and
+the topbar lockup; bare, inheriting `currentColor`, it is the inline mark.
 
 ## Not in this version
 

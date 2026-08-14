@@ -1,0 +1,200 @@
+<!doctype html>
+<!--
+  Source for public/og.png — the 1200x630 card that shows when a link is shared.
+  The image was previously committed as a flat PNG with no source, so the title
+  could not be changed without redrawing it. This is that source.
+
+  Regenerate:  npm run og
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Same palette as src/index.css. Kept literal rather than imported so the
+         card renders standalone in a headless browser. */
+      :root {
+        --ink: #f2f4ee;
+        --ink-3: #7d8d82;
+        --green: #46c78c;
+        --green-bright: #008751;
+        --brass: #d2a93c;
+        --indigo: #8fb2cd;
+        --cream: #e8e4d8;
+        --cream-2: #d6d1c1;
+        --cream-3: #c3bdab;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+
+      .card {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        display: flex;
+        align-items: center;
+        background:
+          radial-gradient(120% 130% at 12% 0%, #123024 0%, #0b2117 45%, #050f0a 100%);
+        font-family: "Archivo", sans-serif;
+      }
+
+      /* The flag's white stripe, reduced to an edge — the same device the page
+         uses to say "document" before it says anything else. */
+      .card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 10px;
+        background: var(--green-bright);
+      }
+
+      .copy {
+        padding-left: 90px;
+        width: 690px;
+        flex: none;
+      }
+
+      .lockup {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 26px;
+      }
+
+      .eyebrow {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      h1 {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: 104px;
+        font-weight: 600;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+      }
+
+      .tagline {
+        margin-top: 26px;
+        font-size: 23px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: rgba(242, 244, 238, 0.82);
+      }
+
+      .arms {
+        display: flex;
+        gap: 26px;
+        margin-top: 52px;
+        font-size: 17px;
+        font-weight: 500;
+        color: rgba(242, 244, 238, 0.6);
+      }
+
+      .arm {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+
+      .art {
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <!-- The specimen: a domed legislature on its plinth, drawn the way the
+           scene stages one — schematic massing, brass ring, nothing literal. -->
+      <svg class="art" width="620" height="630" viewBox="0 0 620 630" fill="none">
+        <defs>
+          <linearGradient id="dome" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5fb98d" />
+            <stop offset="1" stop-color="#2f7d59" />
+          </linearGradient>
+          <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0d2c1d" />
+            <stop offset="1" stop-color="#061710" />
+          </linearGradient>
+        </defs>
+
+        <!-- plinth -->
+        <ellipse cx="300" cy="468" rx="243" ry="47" fill="url(#well)" />
+        <ellipse cx="300" cy="468" rx="243" ry="47" fill="none" stroke="var(--brass)" stroke-width="2.5" opacity="0.85" />
+
+        <!-- wings -->
+        <rect x="60" y="386" width="480" height="62" fill="var(--cream-2)" />
+        <rect x="60" y="378" width="480" height="9" fill="#3f8f68" />
+
+        <!-- second tier -->
+        <rect x="152" y="342" width="296" height="106" fill="var(--cream-3)" />
+        <rect x="152" y="334" width="296" height="9" fill="#3f8f68" />
+
+        <!-- centre block -->
+        <rect x="212" y="292" width="176" height="156" fill="var(--cream)" />
+        <rect x="202" y="278" width="196" height="16" fill="var(--cream-2)" />
+
+        <!-- dome and spire -->
+        <path d="M246 278a54 54 0 0 1 108 0z" fill="url(#dome)" />
+        <rect x="296" y="182" width="8" height="42" rx="4" fill="var(--brass)" />
+        <circle cx="300" cy="176" r="9" fill="var(--brass)" />
+        <rect x="291" y="218" width="18" height="10" rx="3" fill="var(--cream-2)" />
+      </svg>
+
+      <div class="copy">
+        <div class="lockup">
+          <svg width="34" height="34" viewBox="0 0 24 24">
+            <rect width="24" height="24" rx="5.6" fill="var(--green-bright)" />
+            <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5.2 5.9 12 13.2 18.8 5.9" stroke-width="2.4" />
+              <path d="M12 13.2V18.8" stroke-width="3.5" />
+            </g>
+          </svg>
+          <span class="eyebrow">An interactive guide</span>
+        </div>
+
+        <h1>Three&nbsp;Arms</h1>
+
+        <p class="tagline">
+          How Nigeria&rsquo;s government works — the three arms,<br />the three
+          tiers, and how a bill becomes law.
+        </p>
+
+        <div class="arms">
+          <span class="arm"><span class="dot" style="background: var(--green)"></span>Legislature</span>
+          <span class="arm"><span class="dot" style="background: var(--brass)"></span>Executive</span>
+          <span class="arm"><span class="dot" style="background: var(--indigo)"></span>Judiciary</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

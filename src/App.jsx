@@ -58,8 +58,11 @@ export default function App() {
     <div className="shell">
       <header className="topbar">
         <button className="wordmark" onClick={() => toInstitution(FIRST.id)}>
-          <Confluence />
-          <span>How Nigeria&rsquo;s Government Works</span>
+          <Confluence badge />
+          <span className="wordmark-text">
+            <span className="wordmark-name">Three Arms</span>
+            <span className="wordmark-tagline">How Nigeria&rsquo;s government works</span>
+          </span>
         </button>
         <span className="topbar-spacer" />
         <span className="topbar-note">

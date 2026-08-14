@@ -128,8 +128,32 @@ button {
 .confluence path {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.4;
   stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Two channels in, one heavier river out. The step at the junction is the
+   point of the mark, not a slip. */
+.confluence-channels {
+  stroke-width: 2.4;
+}
+
+.confluence-trunk {
+  stroke-width: 3.5;
+}
+
+/* The badge lockup: the same drawing the favicon carries. */
+.confluence-badge {
+  width: 26px;
+  height: 26px;
+}
+
+.confluence-badge path {
+  stroke: #fff;
+}
+
+.confluence-tile {
+  fill: var(--green-bright);
 }
 
 /* ---------- shell ---------- */
@@ -164,12 +188,31 @@ button {
   color: var(--green);
 }
 
-.wordmark span {
+/* The name carries the identity, the tagline carries the meaning — so someone
+   who has never heard "Three Arms Zone" still knows what they are looking at. */
+.wordmark-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.15;
+}
+
+.wordmark-name {
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.015em;
   color: var(--ink);
+  white-space: nowrap;
+}
+
+.wordmark-tagline {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
   white-space: nowrap;
 }
 
