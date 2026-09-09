@@ -19,8 +19,8 @@ export default function ChamberRig({ dim = false }) {
     <>
       {/* Warm bounce off oak and red carpet fills a real chamber from below as
           much as the ceiling lights it from above. */}
-      <hemisphereLight args={["#fff2e0", "#5a2820", 0.4 * level]} />
-      <ambientLight intensity={0.16 * level} />
+      <hemisphereLight args={["#fff2e0", "#5a2820", 0.26 * level]} />
+      <ambientLight intensity={0.09 * level} />
 
       {/* The key sits over the floor of the House and points at the dais, which
           is where the room's attention goes and where the modelling is best
@@ -30,7 +30,7 @@ export default function ChamberRig({ dim = false }) {
         target-position={[0, 1.6, 0]}
         angle={0.8}
         penumbra={0.7}
-        intensity={220 * level}
+        intensity={120 * level}
         distance={30}
         color="#fff4e4"
         castShadow
@@ -49,18 +49,18 @@ export default function ChamberRig({ dim = false }) {
         <pointLight
           key={`${x}:${z}`}
           position={[x, y, z]}
-          intensity={58 * level}
+          intensity={26 * level}
           distance={30}
-          decay={1.8}
+          decay={2}
           color="#ffeeda"
         />
       ))}
-      <pointLight position={[0, 3.2, 7.5]} intensity={34 * level} distance={24} decay={1.8} color="#ffe9d2" />
+      <pointLight position={[0, 3.2, 7.5]} intensity={16 * level} distance={24} decay={2} color="#ffe9d2" />
 
       {/* A cool sliver from the flanking doorways, so the dais wall does not
           read as a single flat wash of warm light. */}
-      <pointLight position={[-8.4, 2.2, 0.4]} intensity={14 * level} distance={9} color="#cfe0ff" />
-      <pointLight position={[8.4, 2.2, 0.4]} intensity={14 * level} distance={9} color="#cfe0ff" />
+      <pointLight position={[-8.4, 2.2, 0.4]} intensity={9 * level} distance={9} color="#cfe0ff" />
+      <pointLight position={[8.4, 2.2, 0.4]} intensity={9 * level} distance={9} color="#cfe0ff" />
     </>
   );
 }

@@ -14,6 +14,12 @@ const LOOK = [0, 1.5, 2.8];
 const REACH = cameraReach(LOOK);
 const MAX_POLAR = cameraMaxPolar(LOOK, REACH);
 
+// Three-quarter from the floor of the House. Dead-on holds the dais elevation
+// nicely but flattens the rake to a set of faint rings, because looking straight
+// down a tiered bank hides every riser behind the tread in front of it.
+const BEARING = [0.418, 0.358, 0.835];
+const eyeAt = (look, reach) => BEARING.map((c, i) => look[i] + c * reach * 0.98);
+
 // One entry per modelled interior: the geometry chunk, and the facts about the
 // room a camera needs in order to stand inside it.
 //
@@ -29,15 +35,11 @@ const MAX_POLAR = cameraMaxPolar(LOOK, REACH);
 const INTERIORS = {
   senate: {
     load: () => import("./SenateChamber.jsx"),
-    // Three-quarter from the floor of the House. Dead-on holds the dais
-    // elevation nicely but flattens the rake to a set of faint rings, because
-    // looking straight down a tiered bank hides every riser behind the tread in
-    // front of it. Off-axis costs a little symmetry and buys the shape of the
-    // room.
-    // Pulled in from where it used to sit: the old eye stood 8.87 m off the
-    // target, which is further than the room now lets a camera go, so
-    // OrbitControls would have hauled it in on the first frame.
-    eye: [3.5, 4.5, 9.8],
+    // Placed along a bearing at nearly full reach rather than written down as a
+    // point. Reach moves whenever the room does, and an eye left behind outside
+    // it is simply hauled in by the controls on the first frame — quietly
+    // framing the room tighter than intended, with nothing to say it had.
+    eye: eyeAt(LOOK, REACH),
     look: LOOK,
     // The fence, all of it derived in chamberPlan from the room's own numbers.
     // Nothing here is a tuned angle.

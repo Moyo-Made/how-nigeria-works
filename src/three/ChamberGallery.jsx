@@ -85,12 +85,18 @@ function Tiers() {
     <group>
       {galleryRows().map(({ index, y, treadInner, treadOuter }) => (
         <group key={index}>
-          <mesh position={[0, y - GALLERY_STEP / 2, 0]} receiveShadow castShadow>
-            <cylinderGeometry
-              args={[treadInner, treadInner, GALLERY_STEP, SEGMENTS, 1, true, -HALF, GALLERY_FAN]}
-            />
-            <meshStandardMaterial {...CARPET_SHADE} side={THREE.DoubleSide} />
-          </mesh>
+          {/* The front row has no riser of its own: its face is the balcony
+              fascia, which stands at exactly this radius over exactly this
+              height. Drawing both put two cylinders in the same place and the
+              seam between them tore. */}
+          {index > 0 && (
+            <mesh position={[0, y - GALLERY_STEP / 2, 0]} receiveShadow castShadow>
+              <cylinderGeometry
+                args={[treadInner, treadInner, GALLERY_STEP, SEGMENTS, 1, true, -HALF, GALLERY_FAN]}
+              />
+              <meshStandardMaterial {...CARPET_SHADE} side={THREE.DoubleSide} />
+            </mesh>
+          )}
           <Ring inner={treadInner} outer={treadOuter} y={y} material={CARPET_RED} />
         </group>
       ))}

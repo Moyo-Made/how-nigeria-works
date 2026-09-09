@@ -164,11 +164,13 @@ export const cameraHalfSweep = (target, reach, maxPolar) =>
 // inside the shell; it lets it out by however far the target is off centre. And
 // the curved wall is drawn BackSide, so from outside it is not there: the room
 // loses its wall and shows you the back of everything in it.
-// Measured against the gallery front rather than the wall: the gallery hangs
-// inboard of the shell, so it, not the masonry, is the innermost thing the eye
-// can put itself inside.
-export const cameraReach = (target, margin = 0.6) =>
-  GALLERY_FRONT - Math.hypot(target[0], target[2]) - margin;
+// Measured against the shell, and the gallery is kept out of the way rather than
+// allowed to set this. Treating the balcony as the limit was a mistake worth
+// recording: it only obstructs above its own soffit, and clamping reach as
+// though it were a wall took the eye from 8.5 m to 7 and shut the room down to
+// the dais. The soffit is high enough that the eye passes under it instead.
+export const cameraReach = (target, margin = 1.5) =>
+  WALL_R - Math.hypot(target[0], target[2]) - margin;
 
 // How low the eye may swing. Far enough down to read the rake, not so far that
 // it drops into the back row: at full reach the eye must clear the desk top of
@@ -199,12 +201,21 @@ export const cameraMaxPolar = (target, reach, clear = 0.6) => {
 // from 312 the shape above would be wrong.
 
 export const GALLERY_FRONT = 10.4; // front edge, cantilevered over the back rows
-export const GALLERY_RISE = 4.6; // floor of the first gallery row
+// Floor of the first gallery row. Set high deliberately, and not only because a
+// public gallery sits high: the balcony is the innermost thing in the room, so
+// wherever its soffit lands is a ceiling on how far back the eye can stand
+// underneath it. Dropped to 4.6 it cost nearly two metres of reach and left the
+// chamber unviewable as a room — you could see the dais and nothing else.
+export const GALLERY_RISE = 6.6;
 export const GALLERY_SLAB = 0.4; // structure below that floor
 export const GALLERY_ROWS = 3;
 export const GALLERY_PITCH = 0.8;
 export const GALLERY_STEP = 0.42;
-export const GALLERY_PARAPET = 1.0;
+// Low enough that the seating behind it still reads from the floor. At 1.0 m it
+// stood a clear 4 cm above the front row's seat backs and swallowed the row
+// whole — correct for a real parapet with people behind it, wrong for a model
+// whose job is to show that the row is there.
+export const GALLERY_PARAPET = 0.85;
 
 // How far round the balcony can run: the curved wall is only wall where it
 // stands in front of the dais elevation, and past that point the flat wall has
