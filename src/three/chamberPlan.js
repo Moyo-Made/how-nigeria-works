@@ -63,7 +63,7 @@ export const rows = () =>
       y: (index + 1) * ROW_RISE, // floor level of this row
       treadInner: WELL_R + index * ROW_PITCH,
       treadOuter: WELL_R + (index + 1) * ROW_PITCH,
-      seats: Math.floor((FAN * radius) / SEAT_PITCH),
+      seats: rowBlocks(radius).reduce((total, block) => total + block.seats, 0),
     };
   });
 
@@ -89,10 +89,47 @@ export const SEAT_H = 0.45; // seat pad above the floor of its own row
 // bench arcs have to stop short of it instead of running into it.
 export const RETURN_W = 0.26;
 
-// A bench arc sweeps the full fan less the returns it would otherwise disappear
-// into. Taken as an arc length rather than a fixed angle, so the clearance is
-// the same 13 cm on the front row as on the back one.
-export const benchHalfAngle = (radius) => HALF_FAN - RETURN_W / 2 / radius;
+// ---- Radial gangways --------------------------------------------------------
+// A chamber where a seat in the middle of a row can only be reached by climbing
+// over the people beside it is not a chamber, and until now this one had no
+// aisles at all.
+//
+// They are cut here, in the generator, because that is the only place they can
+// be cut honestly: notching them into the geometry downstream would leave the
+// seat count describing a room that no longer exists, and the seat count is the
+// only thing testing whether these radii are sane.
+//
+// A gangway is a constant width in metres, so it takes the same arc length out
+// of every row and its angular width narrows as the rows lengthen. Two of them
+// divide the fan into three blocks, which puts no aisle on the centre line and
+// leaves the middle block square to the chair — where the mace and the clerks'
+// table already are. At the back row that leaves no seat more than six places
+// from a gangway.
+//
+// This costs seats, and it is meant to. The floor count falls and moves away
+// from the 312 the room was fitted with. A room with aisles is more right than
+// a room whose total happens to land on the one published figure, and a count
+// that only agreed because nobody could reach their seat was agreeing about
+// the wrong thing.
+export const AISLE_W = 1.1;
+export const AISLES = 2;
+
+const BLOCKS = AISLES + 1;
+
+// Every seating block on a row: where it starts, where it ends, and how many
+// seats fit between. The outer two are held off the stepped returns that close
+// the bank, so the desks and the seat count agree about where the bank stops.
+export const rowBlocks = (radius) => {
+  const aisle = AISLE_W / 2 / radius;
+  const inset = RETURN_W / 2 / radius;
+  const span = FAN / BLOCKS;
+
+  return Array.from({ length: BLOCKS }, (_, i) => {
+    const start = -HALF_FAN + i * span + (i === 0 ? inset : aisle);
+    const end = -HALF_FAN + (i + 1) * span - (i === BLOCKS - 1 ? inset : aisle);
+    return { start, end, seats: Math.max(0, Math.floor(((end - start) * radius) / SEAT_PITCH)) };
+  });
+};
 
 // Chairs sit centred between the back of their own desk and the riser of the row
 // behind, so the gangway closes up or opens out with ROW_PITCH instead of
@@ -104,22 +141,23 @@ export const chairRadius = (row) => (row.radius + BENCH_LIP + row.treadOuter) / 
 // single member's place during the bill sequence, and the seat count that
 // cross-checks the radii are all reading the same room.
 //
-// Seats are spaced evenly across the whole fan with no radial gangways, which no
-// real chamber does. Cutting aisles means removing seats, and the seat count is
-// currently the only thing testing whether these radii are sane — so gangways
-// have to be added here, to rows(), rather than notched into the geometry
-// downstream, or the plan and the room stop describing each other.
+// Seats are numbered across the whole row rather than restarting in each block,
+// so a place keeps one identity however the gangways are later moved.
 export const seatPositions = () =>
   rows().flatMap((row) => {
-    const step = FAN / row.seats;
     const radius = chairRadius(row);
-    return Array.from({ length: row.seats }, (_, seat) => ({
-      row: row.index,
-      seat,
-      angle: -HALF_FAN + (seat + 0.5) * step,
-      radius,
-      y: row.y,
-    }));
+    let n = 0;
+
+    return rowBlocks(row.radius).flatMap((block) => {
+      const step = (block.end - block.start) / block.seats;
+      return Array.from({ length: block.seats }, (_, i) => ({
+        row: row.index,
+        seat: n++,
+        angle: block.start + (i + 0.5) * step,
+        radius,
+        y: row.y,
+      }));
+    });
   });
 
 // ---- Where an eye may stand -------------------------------------------------

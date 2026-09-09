@@ -9,7 +9,7 @@ import {
   BENCH_LIP,
   SEAT_H,
   SEAT_PITCH,
-  benchHalfAngle,
+  rowBlocks,
   rows,
   seatPositions,
 } from "./chamberPlan.js";
@@ -84,21 +84,31 @@ export function SeatPart({ seats, dy, dz, tilt = 0, children }) {
 // The face that matters on a member's desk is the inner one, because that is the
 // one the room sees. The outer face is a modesty panel with a pair of knees
 // behind it and no light on it ever.
+//
+// A row is one desk per seating block rather than one arc across the fan: the
+// gangways are gaps in the benching, and they have to be gaps in this geometry
+// or the aisles the seat count was cut for would not exist in the room. Blocks
+// come from the plan, so a desk can never end somewhere a chair does not.
+//
+// Every arc in this room is concentric, so a block is drawn centred and then
+// turned to its own bearing — the desks stay the same component at every radius.
 function BenchRow({ radius, y }) {
-  return (
-    <CurvedDesk
-      radius={radius}
-      halfAngle={benchHalfAngle(radius)}
-      height={BENCH_H}
-      depth={BENCH_DEPTH}
-      lip={BENCH_LIP}
-      y={y}
-      face={OAK_SHADE}
-      back={OAK}
-      top={OAK}
-      segments={DESK_SEGMENTS}
-    />
-  );
+  return rowBlocks(radius).map((block, index) => (
+    <group key={index} rotation={[0, (block.start + block.end) / 2, 0]}>
+      <CurvedDesk
+        radius={radius}
+        halfAngle={(block.end - block.start) / 2}
+        height={BENCH_H}
+        depth={BENCH_DEPTH}
+        lip={BENCH_LIP}
+        y={y}
+        face={OAK_SHADE}
+        back={OAK}
+        top={OAK}
+        segments={DESK_SEGMENTS}
+      />
+    </group>
+  ));
 }
 
 export default function ChamberBenches() {
