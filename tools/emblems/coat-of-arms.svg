@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 600" width="620" height="600">
+  <!--
+    The Coat of Arms of the Federal Republic of Nigeria, drawn for this project
+    rather than taken from an existing rendering, so nothing here carries a
+    third-party licence into the app.
+
+    Drawn to the official blazon: a black shield charged with a silver pall —
+    the Niger and the Benue meeting at Lokoja — an eagle for strength on a torse
+    above it, two white horses for dignity as supporters, and a compartment of
+    Costus spectabilis, the national flower. Motto since 1978.
+
+    Detail is pitched at the size it is actually seen: this ends up roughly two
+    metres of wall read from across a chamber, so it is built from clear
+    silhouettes rather than fine linework that would disappear anyway.
+  -->
+  <!--
+    Supporters: rearing horses, one either side, facing the shield. Drawn as a
+    single filled silhouette rather than assembled from strokes — separate limbs
+    at this scale splay and read as a spider rather than a horse.
+  -->
+  <defs>
+    <g id="horse" fill="#e9e5dc" stroke="#e9e5dc" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M52 172 C 34 192 24 218 22 244" fill="none" stroke-width="15" />
+      <path d="M74 200 C 70 224 66 242 62 258" fill="none" stroke-width="18" />
+      <path d="M92 204 C 90 226 86 242 82 256" fill="none" stroke-width="16" />
+      <circle cx="76" cy="188" r="31" />
+      <ellipse cx="106" cy="152" rx="40" ry="28" transform="rotate(-40 106 152)" />
+      <circle cx="132" cy="116" r="26" />
+      <path d="M140 126 C 158 138 166 152 162 170" fill="none" stroke-width="15" />
+      <path d="M126 136 C 140 154 146 172 140 188" fill="none" stroke-width="14" />
+      <path d="M134 104 C 142 84 152 66 164 54" fill="none" stroke-width="28" />
+      <path d="M160 44 C 172 38 186 44 190 54 C 193 62 186 70 176 70 C 166 70 158 62 156 54 Z" />
+      <path d="M158 40 C 154 30 155 22 160 18 C 164 24 166 32 166 40 Z" />
+    </g>
+  </defs>
+  <g>
+    <use href="#horse" transform="translate(30 200) scale(0.95)" />
+    <use href="#horse" transform="translate(590 200) scale(-0.95 0.95)" />
+  </g>
+
+  <!-- crest: the eagle, on its torse -->
+  <!--
+    The eagle. Notched trailing edges on the wings and a small head turned to
+    the side are what stop this reading as a winged figure — a round head on a
+    bulbous body between two smooth wings is an angel, not a bird.
+  -->
+  <g fill="#c8102e">
+    <path
+      d="M302 96 C 286 78 264 62 238 52 C 246 62 250 70 250 78
+         C 240 70 228 64 214 60 C 224 72 230 82 232 92
+         C 222 88 212 86 202 86 C 216 96 228 108 236 122
+         C 254 108 278 100 302 102 Z"
+    />
+    <path
+      d="M318 96 C 334 78 356 62 382 52 C 374 62 370 70 370 78
+         C 380 70 392 64 406 60 C 396 72 390 82 388 92
+         C 398 88 408 86 418 86 C 404 96 392 108 384 122
+         C 366 108 342 100 318 102 Z"
+    />
+    <path
+      d="M310 66 C 319 74 324 90 323 108 C 322 126 318 142 310 156
+         C 302 142 298 126 297 108 C 296 90 301 74 310 66 Z"
+    />
+    <path d="M304 50 C 312 48 319 53 320 60 C 321 68 315 74 307 74 C 299 74 294 68 295 60 C 296 53 299 51 304 50 Z" />
+    <path d="M296 56 L 276 62 L 296 70 Z" />
+  </g>
+  <g>
+    <rect x="262" y="150" width="96" height="13" rx="6" fill="#141414" />
+    <rect x="274" y="150" width="16" height="13" fill="#e9e5dc" />
+    <rect x="306" y="150" width="16" height="13" fill="#e9e5dc" />
+    <rect x="338" y="150" width="16" height="13" fill="#e9e5dc" />
+  </g>
+
+  <!-- the shield -->
+  <path
+    d="M212 172 H 408 V 296 C 408 368 366 420 310 448 C 254 420 212 368 212 296 Z"
+    fill="#141414"
+  />
+  <!--
+    The pall. Two channels arrive and one leaves, so the trunk is drawn heavier
+    than the arms — the same reading the app's own mark is built on.
+  -->
+  <g stroke="#e9e5dc" fill="none">
+    <path d="M238 172 L 310 288" stroke-width="40" />
+    <path d="M382 172 L 310 288" stroke-width="40" />
+    <path d="M310 278 V 424" stroke-width="50" />
+  </g>
+
+  <!-- compartment: Costus spectabilis on a green field -->
+  <path
+    d="M72 446 C 134 422 224 412 310 412 C 396 412 486 422 548 446 C 520 478 424 492 310 492 C 196 492 100 478 72 446 Z"
+    fill="#2f6b45"
+  />
+  <g fill="#e3bb3d">
+    <circle cx="168" cy="452" r="9" />
+    <circle cx="238" cy="440" r="9" />
+    <circle cx="382" cy="440" r="9" />
+    <circle cx="452" cy="452" r="9" />
+    <circle cx="310" cy="470" r="9" />
+  </g>
+
+  <!-- motto scroll -->
+  <path d="M118 492 L 502 492 L 488 552 L 132 552 Z" fill="#efece5" />
+  <path d="M118 492 L 502 492 L 500 500 L 120 500 Z" fill="#d6d1c5" />
+  <text
+    x="310"
+    y="532"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="25"
+    fill="#1c1613"
+  >Unity and Faith, Peace and Progress</text>
+</svg>
