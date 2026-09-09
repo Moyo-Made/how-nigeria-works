@@ -24,6 +24,3 @@ import data from "./chambers.json";
 export const chambers = data;
 
 export const getChamber = (id) => data.find((c) => c.id === id) ?? null;
-
-export const chambersOf = (institutionId) =>
-  data.filter((c) => c.institution === institutionId);

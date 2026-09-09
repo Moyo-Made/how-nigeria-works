@@ -49,8 +49,6 @@ export const BACK_WALL_HALF = WALL_R;
 export const DAIS_WALL_Z = -0.5;
 export const DAIS_LIFT = 0.85; // platform height above the floor
 
-export const outerRow = () => ROW_0 + (ROWS - 1) * ROW_PITCH;
-
 // Every row in the chamber, derived from the parameters above rather than
 // placed by hand. One function, so the tier that a row stands on, the bench that
 // sits on it and anything that later needs to address "the third row" can never

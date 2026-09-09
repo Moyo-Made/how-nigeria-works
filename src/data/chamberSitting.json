@@ -6,12 +6,12 @@
     "highlight": "mace",
     "target": [
       0,
-      1.1,
-      4.6
+      0.95,
+      4.84
     ],
-    "azimuth": 0.32,
-    "polar": 1.15,
-    "distance": 3.4
+    "azimuth": 0.28,
+    "polar": 0.8,
+    "distance": 2.8
   },
   {
     "id": "first-reading",

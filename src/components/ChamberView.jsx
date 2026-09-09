@@ -85,8 +85,8 @@ export default function ChamberView({ id }) {
 
   if (!interior) return <NoRoom chamber={chamber} id={id} />;
 
-  const { Component, eye, look, reach, minReach, halfSweep, maxPolar } = interior;
-  const { radius, height, floorSeats, gallerySeats, ground } = interior;
+  const { Component, eye, look, fov, reach, minReach, halfSweep, maxPolar } = interior;
+  const { radius, height, floorSeats, gallerySeats, seats, ground } = interior;
 
   const current = sitting ? stages[stage] : null;
   const clamp = (i) => Math.max(0, Math.min(stages.length - 1, i));
@@ -107,7 +107,7 @@ export default function ChamberView({ id }) {
         <Canvas
           shadows="percentage"
           dpr={[1, 2]}
-          camera={{ position: eye, fov: 58, near: 0.1, far: 120 }}
+          camera={{ position: eye, fov, near: 0.1, far: 120 }}
           gl={{ antialias: true }}
         >
           <color attach="background" args={[ground]} />
@@ -119,6 +119,7 @@ export default function ChamberView({ id }) {
 
           {sitting && (
             <ChamberSitting
+              fov={fov}
               stages={stages}
               index={stage}
               playing={playing}
@@ -195,7 +196,7 @@ export default function ChamberView({ id }) {
               specimen, not a tool, and it is the longest line in the app. */}
           <p className="stage-note">
             {chamber.seatsInstalled} seats were installed in this room ({chamber.source}); the model
-            holds {floorSeats + gallerySeats} &mdash; {floorSeats} on the floor and {gallerySeats} in
+            holds {seats} &mdash; {floorSeats} on the floor and {gallerySeats} in
             the gallery. That agreement is the only check there is: every dimension of the room is
             derived, not sourced, because no floor plan of it is public. Ceiling {height} m, wall
             radius {radius} m.

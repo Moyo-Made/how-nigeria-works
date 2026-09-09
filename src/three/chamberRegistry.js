@@ -8,6 +8,7 @@ import {
   cameraReach,
   floorSeatEstimate,
   gallerySeatEstimate,
+  seatEstimate,
 } from "./chamberPlan.js";
 
 const LOOK = [0, 1.5, 2.8];
@@ -40,6 +41,7 @@ const INTERIORS = {
     // it is simply hauled in by the controls on the first frame — quietly
     // framing the room tighter than intended, with nothing to say it had.
     eye: eyeAt(LOOK, REACH),
+    fov: 58,
     look: LOOK,
     // The fence, all of it derived in chamberPlan from the room's own numbers.
     // Nothing here is a tuned angle.
@@ -58,6 +60,11 @@ const INTERIORS = {
     // for — not as a claim about how the real chamber divides between the two.
     floorSeats: floorSeatEstimate(),
     gallerySeats: gallerySeatEstimate(),
+    // The sum, taken from the plan rather than added up again at the point of
+    // display. It is the one number in this app that says whether the room is
+    // the right size, and a caption that recomputed it could quietly disagree
+    // with the room it is captioning.
+    seats: seatEstimate(),
     ground: "#150b09",
   },
 };

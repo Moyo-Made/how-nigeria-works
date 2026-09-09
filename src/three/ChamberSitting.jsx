@@ -9,14 +9,19 @@ const offset = new THREE.Vector3();
 
 const STAGE_SECONDS = 9;
 
-// The camera aims a little below where it is really looking, so the caption card
-// along the bottom of the well covers empty carpet rather than the thing being
-// described. Same trade the exterior sequence makes, and for the same reason —
-// but a chamber is metres across where a specimen is centimetres, so the offset
-// is in metres too.
-const LOOK_BELOW = 0.5;
-const lookBelow = ({ width, height }) =>
-  LOOK_BELOW * THREE.MathUtils.clamp(width / height, 0.4, 1);
+// The camera aims below what it is really looking at, so the caption card along
+// the bottom of the well covers empty carpet rather than the thing being
+// described.
+//
+// The card covers a fixed share of the well — not a fixed number of metres — so
+// the compensation has to be a share of the frame too, which at a fixed field of
+// view means it scales with distance. A constant offset framed the near stages
+// and stranded the far ones, which is what a metre of drop looks like at three
+// metres and at six.
+const FRAME_SHARE = 0.19;
+const lookBelow = (distance, fov, { width, height }) =>
+  2 * distance * Math.tan((fov * Math.PI) / 360) *
+  FRAME_SHARE * THREE.MathUtils.clamp(width / height, 0.4, 1);
 
 // A stage that names a member rather than a place gets its target from the seat
 // generator, so the camera and the light that lands on them cannot disagree
@@ -28,7 +33,7 @@ const targetOf = (stage, place) => {
   return [x, place.y + 1.15, z];
 };
 
-export default function ChamberSitting({ stages, index, playing, onAdvance }) {
+export default function ChamberSitting({ stages, index, playing, fov, onAdvance }) {
   const camera = useThree((s) => s.camera);
   const size = useThree((s) => s.size);
   const orbit = useRef(null);
@@ -45,7 +50,7 @@ export default function ChamberSitting({ stages, index, playing, onAdvance }) {
 
   useFrame((_, delta) => {
     const [tx, ty, tz] = targetOf(stage, place);
-    aim.current.set(tx, ty - lookBelow(size), tz);
+    aim.current.set(tx, ty - lookBelow(stage.distance, fov, size), tz);
 
     if (!orbit.current) {
       // Picked up from wherever the viewer left the camera rather than cutting

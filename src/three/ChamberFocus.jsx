@@ -1,59 +1,59 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
-import * as THREE from "three";
+import { useMemo } from "react";
 
-import { seatPositions, speakingPlace } from "./chamberPlan.js";
+import { SeatPart } from "./ChamberBenches.jsx";
+import { SEAT_H, SEAT_PITCH, seatPositions, speakingPlace } from "./chamberPlan.js";
 
 // What the sitting sequence points at.
 //
 // Everything here reads the same seat generator the chairs do, so a place the
 // sequence lights is by construction a place a member is actually sitting. That
 // is the whole reason chamberPlan hands out seat positions as data instead of
-// baking them into meshes — a highlight that has to guess where row three is
+// baking them into meshes — a highlight that had to guess where row three is
 // would be wrong the first time ROWS changed.
 
+// Tone-mapped, unlike most emissive markers. Left out of the tone mapper the
+// glow does not read as brighter gold, it clips straight to white — a lit place
+// stops looking like brass catching light and starts looking like a hole cut in
+// the bench. Going through ACES keeps the colour and lets the near caps stay
+// gold while the far ones still read.
 const GLOW = {
-  color: "#f6c95c",
-  emissive: "#f2b437",
-  emissiveIntensity: 1.4,
-  roughness: 0.5,
+  color: "#f4c65e",
+  emissive: "#eda92c",
+  emissiveIntensity: 2.4,
+  roughness: 0.45,
   metalness: 0,
-  toneMapped: false,
 };
+
+// Where a lit place has to be to be seen.
+//
+// The obvious marker is a ring of light on the carpet at a member's feet, and it
+// is the wrong one: from every angle that shows this room as a room, the desk in
+// front of them hides it. The division lit all 171 places and read as a faint
+// scatter of gold behind the benches.
+//
+// So the marker is the cap along the top of the chair back instead — the one
+// part of a chair that stays legible from the far side of the chamber, which is
+// exactly why ChamberBenches gives it an oak cap in the first place. Lighting a
+// place now means that cap glowing, at the same offsets, so a lit chair is the
+// chair rather than something hovering near it.
+const CAP_RISE = SEAT_H + 0.59;
+const CAP_SET = -0.11;
+const RAKE = -0.09;
+
+function Places({ seats }) {
+  return (
+    <SeatPart seats={seats} dy={CAP_RISE} dz={CAP_SET} tilt={RAKE}>
+      <boxGeometry args={[SEAT_PITCH * 0.76 + 0.05, 0.08, 0.135]} />
+      <meshStandardMaterial {...GLOW} />
+    </SeatPart>
+  );
+}
 
 const world = (seat) => [
   Math.sin(seat.angle) * seat.radius,
   seat.y,
   Math.cos(seat.angle) * seat.radius,
 ];
-
-// A ring of light on the carpet at a member's feet. Instanced, because the
-// division stage lights every place on the floor at once and a division is 171
-// of these — which as separate meshes would cost more draw calls than the rest
-// of the chamber put together.
-function Places({ seats }) {
-  const ref = useRef();
-
-  useLayoutEffect(() => {
-    const matrix = new THREE.Matrix4();
-    seats.forEach((seat, i) => {
-      // Rotation first, then the translation column is overwritten — a flat ring
-      // needs no heading, only to lie down.
-      matrix.makeRotationX(-Math.PI / 2);
-      const [x, y, z] = world(seat);
-      matrix.setPosition(x, y + 0.025, z);
-      ref.current.setMatrixAt(i, matrix);
-    });
-    ref.current.instanceMatrix.needsUpdate = true;
-    ref.current.computeBoundingSphere();
-  }, [seats]);
-
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, seats.length]}>
-      <ringGeometry args={[0.23, 0.31, 20]} />
-      <meshStandardMaterial {...GLOW} side={THREE.DoubleSide} />
-    </instancedMesh>
-  );
-}
 
 export default function ChamberFocus({ highlight }) {
   const place = useMemo(() => speakingPlace(), []);
@@ -64,9 +64,10 @@ export default function ChamberFocus({ highlight }) {
     return (
       <group>
         <Places seats={[place]} />
-        {/* Low and close, so it lifts one member out of the bank without
-            washing the row either side of them. */}
-        <pointLight position={[x, y + 1.5, z]} intensity={16} distance={4.5} color="#ffd88c" />
+        {/* One place among a hundred and seventy needs the light as well as the
+            marker: the cap says which chair, the light says look here. */}
+        <pointLight position={[x, y + 1.5, z]} intensity={30} distance={5.5} color="#ffd88c" />
+        <pointLight position={[x, y + 0.55, z]} intensity={9} distance={2.2} color="#ffc766" />
       </group>
     );
   }
