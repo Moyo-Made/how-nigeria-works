@@ -1,0 +1,95 @@
+[
+  {
+    "id": "mace",
+    "title": "The mace is laid",
+    "caption": "The Senate cannot validly sit without it. The Sergeant-at-Arms carries the mace in ahead of the President of the Senate and lays it on the table, and only then is the chamber in session. Take it off the table and whatever happens next is not a sitting.",
+    "highlight": "mace",
+    "target": [
+      0,
+      1.1,
+      4.6
+    ],
+    "azimuth": 0.32,
+    "polar": 1.15,
+    "distance": 3.4
+  },
+  {
+    "id": "first-reading",
+    "title": "First Reading",
+    "caption": "The Clerk reads the bill's title to the chamber. Nothing is debated and nothing is voted on — this stage exists only to put the bill formally before the House.",
+    "highlight": "dais",
+    "target": [
+      0,
+      1.7,
+      1.4
+    ],
+    "azimuth": 0.18,
+    "polar": 1.24,
+    "distance": 5.2
+  },
+  {
+    "id": "second-reading",
+    "title": "Second Reading",
+    "caption": "The senator who brought the bill moves it, and the chamber debates whether it is worth having at all. This is the stage a bill is most likely to die at.",
+    "highlight": "member",
+    "azimuth": 2.4,
+    "polar": 1.25,
+    "distance": 3.6
+  },
+  {
+    "id": "committee",
+    "title": "Committee Stage",
+    "caption": "The chamber rises and the bill goes to a committee, which takes it apart line by line and can rewrite it. None of that work happens in this room — which is why most of what the National Assembly does is invisible from the gallery.",
+    "highlight": "empty",
+    "target": [
+      0,
+      2.2,
+      4.4
+    ],
+    "azimuth": 0.42,
+    "polar": 1.05,
+    "distance": 5.6
+  },
+  {
+    "id": "report",
+    "title": "Report Stage",
+    "caption": "The committee reports back and the chamber works through what it recommends, settling the wording the bill will carry from here on.",
+    "highlight": null,
+    "target": [
+      0,
+      1.8,
+      3.6
+    ],
+    "azimuth": -0.3,
+    "polar": 1.18,
+    "distance": 5.6
+  },
+  {
+    "id": "third-reading",
+    "title": "Third Reading, and the vote",
+    "caption": "The final vote. Every place on the floor is a state's voice, and every state has three of them regardless of its size — which is the whole point of a Senate.",
+    "highlight": "division",
+    "target": [
+      0,
+      1.9,
+      4.2
+    ],
+    "azimuth": 0.2,
+    "polar": 1.1,
+    "distance": 5.8
+  },
+  {
+    "id": "transmitted",
+    "title": "It leaves the room",
+    "caption": "The bill has cleared this chamber. It is still not law: it goes out through those doors to the House of Representatives, which puts it through every one of these stages again — and both chambers must pass the same text.",
+    "highlight": "doors",
+    "target": [
+      -5.4,
+      1.5,
+      0.4
+    ],
+    "azimuth": 0.85,
+    "polar": 1.22,
+    "distance": 5.4
+  }
+]

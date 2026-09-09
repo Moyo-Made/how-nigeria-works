@@ -1,12 +1,20 @@
-import { Suspense } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
 import ChamberRig from "../three/ChamberRig.jsx";
+import ChamberSitting from "../three/ChamberSitting.jsx";
 import { getInterior } from "../three/chamberRegistry.js";
 import { getChamber } from "../data/chambers.js";
 import { getInstitution } from "../data/institutions.js";
 import { toInstitution } from "../hooks/useHashRoute.js";
+import SittingPlayer from "./SittingPlayer.jsx";
+import sittingStages from "../data/chamberSitting.json";
+
+// Same shape as the specimen's animation table: the field is on the data, so a
+// second chamber can carry a different sequence without this file learning its
+// name.
+const ANIMATIONS = { sitting: sittingStages };
 
 // A room is entered from a building, so it is always left back into one. Without
 // this the only way out of the chamber is to pick some other institution off the
@@ -51,11 +59,47 @@ function NoRoom({ chamber, id }) {
 export default function ChamberView({ id }) {
   const chamber = getChamber(id);
   const interior = chamber?.status === "complete" ? getInterior(id) : null;
+  const stages = ANIMATIONS[chamber?.animation] ?? null;
+
+  const [stage, setStage] = useState(null);
+  const [playing, setPlaying] = useState(false);
+  const sitting = stage !== null;
+
+  // Changing room ends whatever the last one was in the middle of.
+  useEffect(() => {
+    setStage(null);
+    setPlaying(false);
+  }, [id]);
+
+  const exit = useCallback(() => {
+    setStage(null);
+    setPlaying(false);
+  }, []);
+
+  useEffect(() => {
+    if (!sitting) return;
+    const onKey = (e) => e.key === "Escape" && exit();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sitting, exit]);
 
   if (!interior) return <NoRoom chamber={chamber} id={id} />;
 
   const { Component, eye, look, reach, minReach, halfSweep, maxPolar } = interior;
   const { radius, height, floorSeats, gallerySeats, ground } = interior;
+
+  const current = sitting ? stages[stage] : null;
+  const clamp = (i) => Math.max(0, Math.min(stages.length - 1, i));
+  const step = (next) => {
+    setStage(clamp(next));
+    setPlaying(false);
+  };
+  // Relative moves go through the updater: two quick taps on Next both read the
+  // same rendered index otherwise, and the second one is lost.
+  const nudge = (delta) => {
+    setStage((s) => clamp(s + delta));
+    setPlaying(false);
+  };
 
   return (
     <div className="stage-col">
@@ -67,11 +111,20 @@ export default function ChamberView({ id }) {
           gl={{ antialias: true }}
         >
           <color attach="background" args={[ground]} />
-          <ChamberRig />
+          <ChamberRig dim={current?.highlight === "empty"} />
 
           <Suspense fallback={null}>
-            <Component />
+            <Component highlight={current?.highlight ?? null} />
           </Suspense>
+
+          {sitting && (
+            <ChamberSitting
+              stages={stages}
+              index={stage}
+              playing={playing}
+              onAdvance={() => setStage((s) => s + 1)}
+            />
+          )}
 
           {/* The eye is fenced into the part of the room that was built. Every
               limit comes off the room's own plan rather than being tuned here —
@@ -83,6 +136,9 @@ export default function ChamberView({ id }) {
               of all of it. */}
           <OrbitControls
             makeDefault
+            // The sequence drives the camera itself; leaving these live would
+            // have both writing to it every frame.
+            enabled={!sitting}
             target={look}
             enablePan={false}
             minDistance={minReach}
@@ -96,25 +152,56 @@ export default function ChamberView({ id }) {
           />
         </Canvas>
 
-        <p className="stage-tip">
-          {chamber.name} &middot; the {chamber.byColour} &middot; {chamber.summary} &middot; drag to
-          look around
-        </p>
+        {sitting ? (
+          <SittingPlayer
+            stages={stages}
+            index={stage}
+            playing={playing}
+            onStep={step}
+            onNudge={nudge}
+            onPlayPause={() => setPlaying((p) => !p)}
+            onExit={exit}
+          />
+        ) : (
+          <p className="stage-tip">
+            {chamber.name} &middot; the {chamber.byColour} &middot; {chamber.summary} &middot; drag
+            to look around
+          </p>
+        )}
       </div>
 
-      <div className="toolbar">
-        <BackOut chamber={chamber} />
-      </div>
+      {!sitting && (
+        <>
+          <div className="toolbar">
+            <BackOut chamber={chamber} />
+            {stages && (
+              <>
+                <span className="tool-spacer" />
+                <button
+                  className="cta"
+                  onClick={() => {
+                    setStage(0);
+                    setPlaying(true);
+                  }}
+                >
+                  <span className="cta-play" aria-hidden="true" />
+                  Watch a sitting
+                </button>
+              </>
+            )}
+          </div>
 
-      {/* Below the controls rather than beside them: it is the caption on the
-          specimen, not a tool, and it is the longest line in the app. */}
-      <p className="stage-note">
-        {chamber.seatsInstalled} seats were installed in this room ({chamber.source}); the model
-        holds {floorSeats + gallerySeats} &mdash; {floorSeats} on the floor and {gallerySeats} in
-        the gallery. That agreement is the only check there is: every dimension of the room is
-        derived, not sourced, because no floor plan of it is public. Ceiling {height} m, wall
-        radius {radius} m.
-      </p>
+          {/* Below the controls rather than beside them: it is the caption on the
+              specimen, not a tool, and it is the longest line in the app. */}
+          <p className="stage-note">
+            {chamber.seatsInstalled} seats were installed in this room ({chamber.source}); the model
+            holds {floorSeats + gallerySeats} &mdash; {floorSeats} on the floor and {gallerySeats} in
+            the gallery. That agreement is the only check there is: every dimension of the room is
+            derived, not sourced, because no floor plan of it is public. Ceiling {height} m, wall
+            radius {radius} m.
+          </p>
+        </>
+      )}
     </div>
   );
 }

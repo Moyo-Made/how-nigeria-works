@@ -106,12 +106,19 @@ function Parapet() {
   return (
     <group>
       <Band radius={GALLERY_FRONT} from={GALLERY_RISE} to={top} material={OAK} />
+      {/* The coping has to be open-ended. A closed cylinder caps its ends, and
+          on a 178-degree arc at this radius those caps are pie slices struck
+          from the room's own axis — a solid lid across half the chamber at
+          eye-height-plus-four. Harmless on a full cylinder, which is why the
+          dais platform above can close and this cannot. */}
       <mesh position={[0, top + 0.03, 0]} receiveShadow castShadow>
         <cylinderGeometry
-          args={[GALLERY_FRONT + 0.06, GALLERY_FRONT + 0.06, 0.07, SEGMENTS, 1, false, -HALF, GALLERY_FAN]}
+          args={[GALLERY_FRONT + 0.06, GALLERY_FRONT + 0.06, 0.07, SEGMENTS, 1, true, -HALF, GALLERY_FAN]}
         />
-        <meshStandardMaterial {...OAK_SHADE} />
+        <meshStandardMaterial {...OAK_SHADE} side={THREE.DoubleSide} />
       </mesh>
+      {/* the flat of the rail, which the open band no longer provides */}
+      <Ring inner={GALLERY_FRONT} outer={GALLERY_FRONT + 0.06} y={top + 0.065} material={OAK_SHADE} />
     </group>
   );
 }

@@ -13,6 +13,7 @@ import {
 } from "./materials.js";
 import ChamberTiers from "./ChamberTiers.jsx";
 import ChamberBenches from "./ChamberBenches.jsx";
+import ChamberFocus from "./ChamberFocus.jsx";
 import ChamberGallery from "./ChamberGallery.jsx";
 import CurvedDesk from "./CurvedDesk.jsx";
 import {
@@ -316,42 +317,48 @@ function PresidingChair() {
 //
 // Built along Y because that is the axis every cylinder here is native to, then
 // laid on its side, the way it rests on the table between sittings.
-function Mace({ length = 0.92 }) {
+function Mace({ length = 0.92, lit = false }) {
   const shaft = length * 0.58;
+  // Lit, it is the same brass with the light turned up inside it rather than a
+  // different object. The mace is the one thing in this room whose presence is
+  // itself the fact being taught, so it has to read as the same mace.
+  const brass = lit
+    ? { ...BRASS, emissive: "#c9931f", emissiveIntensity: 0.85, toneMapped: false }
+    : BRASS;
 
   return (
     <group rotation={[0, 0, Math.PI / 2]}>
       <mesh castShadow>
         <cylinderGeometry args={[length * 0.026, length * 0.032, shaft, 16]} />
-        <meshStandardMaterial {...BRASS} />
+        <meshStandardMaterial {...brass} />
       </mesh>
 
       {/* collars breaking up the shaft */}
       {[-0.28, 0.06].map((t) => (
         <mesh key={t} position={[0, shaft * t, 0]} castShadow>
           <cylinderGeometry args={[length * 0.042, length * 0.042, length * 0.028, 16]} />
-          <meshStandardMaterial {...BRASS} />
+          <meshStandardMaterial {...brass} />
         </mesh>
       ))}
 
       {/* head: bulb, crown and the arms on top */}
       <mesh position={[0, shaft * 0.5 + length * 0.05, 0]} castShadow>
         <sphereGeometry args={[length * 0.062, 20, 14]} />
-        <meshStandardMaterial {...BRASS} />
+        <meshStandardMaterial {...brass} />
       </mesh>
       <mesh position={[0, shaft * 0.5 + length * 0.125, 0]} castShadow>
         <cylinderGeometry args={[length * 0.055, length * 0.038, length * 0.07, 16, 1, true]} />
-        <meshStandardMaterial {...BRASS} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...brass} side={THREE.DoubleSide} />
       </mesh>
       <mesh position={[0, shaft * 0.5 + length * 0.18, 0]} castShadow>
         <sphereGeometry args={[length * 0.03, 14, 10]} />
-        <meshStandardMaterial {...BRASS} />
+        <meshStandardMaterial {...brass} />
       </mesh>
 
       {/* tapered foot */}
       <mesh position={[0, -shaft * 0.5 - length * 0.06, 0]} castShadow>
         <coneGeometry args={[length * 0.032, length * 0.12, 16]} />
-        <meshStandardMaterial {...BRASS} />
+        <meshStandardMaterial {...brass} />
       </mesh>
     </group>
   );
@@ -359,7 +366,7 @@ function Mace({ length = 0.92 }) {
 
 // Directly below and in front of the dais: oak, with a baize inset top and the
 // brass stanchions that cradle the mace.
-function ClerksTable() {
+function ClerksTable({ maceLit }) {
   const height = 0.78;
   const depth = 0.8;
   const halfAngle = 0.26;
@@ -409,7 +416,7 @@ function ClerksTable() {
       ))}
 
       <group position={[0, maceY, CLERKS_R - 0.06]}>
-        <Mace />
+        <Mace lit={maceLit} />
       </group>
     </group>
   );
@@ -446,7 +453,7 @@ function Shell() {
   );
 }
 
-export default function SenateChamber(props) {
+export default function SenateChamber({ highlight = null, ...props }) {
   return (
     <group {...props}>
       <Shell />
@@ -455,7 +462,8 @@ export default function SenateChamber(props) {
       <ChamberBenches />
       <DaisWall />
       <Dais />
-      <ClerksTable />
+      <ClerksTable maceLit={highlight === "mace"} />
+      <ChamberFocus highlight={highlight} />
     </group>
   );
 }

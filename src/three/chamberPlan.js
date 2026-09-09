@@ -246,3 +246,12 @@ export const gallerySeatEstimate = () =>
 // Floor and gallery together, against the 312 the room was fitted with. This is
 // the whole point of generating the room rather than placing it.
 export const seatEstimate = () => floorSeatEstimate() + gallerySeatEstimate();
+
+// One named place on the floor, for anything that has to address a single member
+// rather than the whole room — the sitting sequence points both a camera and a
+// light at it. Which seat it is does not matter. That everything agrees on the
+// same one does, which is why it is resolved here and not at each use.
+export const speakingPlace = () => {
+  const row = seatPositions().filter((seat) => seat.row === 2);
+  return row[Math.floor(row.length * 0.34)];
+};
