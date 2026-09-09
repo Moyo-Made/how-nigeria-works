@@ -55,7 +55,7 @@ export default function ChamberView({ id }) {
   if (!interior) return <NoRoom chamber={chamber} id={id} />;
 
   const { Component, eye, look, reach, minReach, halfSweep, maxPolar } = interior;
-  const { radius, height, floorSeats, ground } = interior;
+  const { radius, height, floorSeats, gallerySeats, ground } = interior;
 
   return (
     <div className="stage-col">
@@ -109,9 +109,10 @@ export default function ChamberView({ id }) {
       {/* Below the controls rather than beside them: it is the caption on the
           specimen, not a tool, and it is the longest line in the app. */}
       <p className="stage-note">
-        {chamber.seatsInstalled} seats were installed in this room ({chamber.source}), galleries
-        included; the floor modelled here holds {floorSeats}. Every dimension of the room is
-        derived, not sourced &mdash; no floor plan of it is public. Ceiling {height} m, wall
+        {chamber.seatsInstalled} seats were installed in this room ({chamber.source}); the model
+        holds {floorSeats + gallerySeats} &mdash; {floorSeats} on the floor and {gallerySeats} in
+        the gallery. That agreement is the only check there is: every dimension of the room is
+        derived, not sourced, because no floor plan of it is public. Ceiling {height} m, wall
         radius {radius} m.
       </p>
     </div>

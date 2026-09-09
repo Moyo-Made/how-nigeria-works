@@ -13,6 +13,7 @@ import {
 } from "./materials.js";
 import ChamberTiers from "./ChamberTiers.jsx";
 import ChamberBenches from "./ChamberBenches.jsx";
+import ChamberGallery from "./ChamberGallery.jsx";
 import CurvedDesk from "./CurvedDesk.jsx";
 import {
   BACK_WALL_HALF,
@@ -197,8 +198,18 @@ function DaisWall() {
 // The presiding chair, its platform, and the curved baize desk in front of it.
 // The desk is a partial cylinder concentric with everything else in the room, so
 // it faces the benches by construction.
+// A desk sits about this far above the seat it is worked at, and the presiding
+// chair's pad sits this far above the platform. Both live here rather than
+// inside the two components that need them, because the desk height is derived
+// from the seat height and the two silently disagreeing is exactly the fault
+// this replaces: the desk stood 1.05 m above the platform against a seat 0.48 m
+// up, which put its top 0.57 m above the seat — near enough double a desk, and
+// the President of the Senate at a surface near chin height.
+const CHAIR_SEAT = 0.48;
+const DESK_OVER_SEAT = 0.3;
+
 function Dais() {
-  const deskH = 1.05;
+  const deskH = CHAIR_SEAT + DESK_OVER_SEAT;
   const platformHalf = HALF_FAN * 0.42;
 
   return (
@@ -260,7 +271,7 @@ function Dais() {
 }
 
 function PresidingChair() {
-  const seat = DAIS_LIFT + 0.48;
+  const seat = DAIS_LIFT + CHAIR_SEAT;
 
   return (
     <group position={[0, 0, DAIS_R - 1.5]}>
@@ -440,6 +451,7 @@ export default function SenateChamber(props) {
     <group {...props}>
       <Shell />
       <ChamberTiers />
+      <ChamberGallery />
       <ChamberBenches />
       <DaisWall />
       <Dais />

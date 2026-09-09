@@ -37,13 +37,16 @@ export const ROWS = 6;
 export const SEAT_PITCH = 0.74;
 export const ROW_RISE = 0.34; // each tier steps up by this much
 
-export const GALLERY_R = 12.0;
 export const WALL_R = 12.8;
 export const WALL_H = 11.5;
 
 // The dais end of the room is flat — a D-plan, with the curved wall wrapping the
 // seating and a straight wall carrying the panelled elevation behind the chair.
 export const BACK_WALL_HALF = WALL_R;
+// Front face of the panelled elevation. Two things are measured off it: how far
+// round the curved wall actually runs before the flat one takes over, and how
+// far back the eye may go.
+export const DAIS_WALL_Z = -0.5;
 export const DAIS_LIFT = 0.85; // platform height above the floor
 
 export const outerRow = () => ROW_0 + (ROWS - 1) * ROW_PITCH;
@@ -131,11 +134,10 @@ export const seatPositions = () =>
 // rather than tuned by eye, so that changing ROWS or WALL_R moves the fence with
 // the room instead of quietly letting the camera out of it.
 
-// The plane the eye may not cross. The dais elevation stands at z = -0.5 with
-// its panelling a little nearer; behind it is a crescent of dead space between
-// that flat wall and the cylinder — a room nobody has ever been in, and the
-// thing an unclamped sweep puts on screen.
-export const DAIS_PLANE = -0.1;
+// The plane the eye may not cross. Behind the dais elevation is a crescent of
+// dead space between that flat wall and the cylinder — a room nobody has ever
+// been in, and the thing an unclamped sweep puts on screen.
+export const DAIS_PLANE = DAIS_WALL_Z + 0.4;
 
 // The widest the eye may swing, and it is not 360.
 //
@@ -162,8 +164,11 @@ export const cameraHalfSweep = (target, reach, maxPolar) =>
 // inside the shell; it lets it out by however far the target is off centre. And
 // the curved wall is drawn BackSide, so from outside it is not there: the room
 // loses its wall and shows you the back of everything in it.
-export const cameraReach = (target, margin = 1.5) =>
-  WALL_R - Math.hypot(target[0], target[2]) - margin;
+// Measured against the gallery front rather than the wall: the gallery hangs
+// inboard of the shell, so it, not the masonry, is the innermost thing the eye
+// can put itself inside.
+export const cameraReach = (target, margin = 0.6) =>
+  GALLERY_FRONT - Math.hypot(target[0], target[2]) - margin;
 
 // How low the eye may swing. Far enough down to read the rake, not so far that
 // it drops into the back row: at full reach the eye must clear the desk top of
@@ -175,3 +180,69 @@ export const cameraMaxPolar = (target, reach, clear = 0.6) => {
   );
 };
 
+// ---- Galleries --------------------------------------------------------------
+// The room does not stop at the back bench, and this is where the arithmetic
+// says so. 312 seats were installed in this chamber; the floor built above holds
+// 171. Something on the order of 140 places are therefore somewhere else, and in
+// a room this size a balcony over the rear of the fan is the only place they can
+// be. That gap is the nearest thing to a measurement the gallery has.
+//
+// Nothing else about it is published — not its height, not its depth, not how
+// many rows it carries. What shapes it instead are two clearances that are not
+// negotiable and one geometric fact:
+//
+//   - the soffit has to clear a person seated on the back bench;
+//   - the parapet has to sit low enough to see the floor over from the front row;
+//   - and the curved wall only runs as far as the flat one lets it.
+//
+// The seat count that falls out is the check, not the target. If it landed far
+// from 312 the shape above would be wrong.
+
+export const GALLERY_FRONT = 10.4; // front edge, cantilevered over the back rows
+export const GALLERY_RISE = 4.6; // floor of the first gallery row
+export const GALLERY_SLAB = 0.4; // structure below that floor
+export const GALLERY_ROWS = 3;
+export const GALLERY_PITCH = 0.8;
+export const GALLERY_STEP = 0.42;
+export const GALLERY_PARAPET = 1.0;
+
+// How far round the balcony can run: the curved wall is only wall where it
+// stands in front of the dais elevation, and past that point the flat wall has
+// taken over. Inset slightly so the ends die into panelling rather than into the
+// junction itself.
+export const GALLERY_FAN = 2 * (Math.acos(DAIS_WALL_Z / WALL_R) - 0.05);
+
+// The last row's tread lands exactly on the wall, which is what fixes ROWS
+// against PITCH here rather than leaving both free.
+export const galleryRows = () =>
+  Array.from({ length: GALLERY_ROWS }, (_, index) => {
+    const treadInner = GALLERY_FRONT + index * GALLERY_PITCH;
+    const radius = treadInner + GALLERY_PITCH * 0.5;
+    return {
+      index,
+      treadInner,
+      treadOuter: treadInner + GALLERY_PITCH,
+      radius,
+      y: GALLERY_RISE + index * GALLERY_STEP,
+      seats: Math.floor((GALLERY_FAN * radius) / SEAT_PITCH),
+    };
+  });
+
+export const gallerySeatPositions = () =>
+  galleryRows().flatMap((row) => {
+    const step = GALLERY_FAN / row.seats;
+    return Array.from({ length: row.seats }, (_, seat) => ({
+      row: row.index,
+      seat,
+      angle: -GALLERY_FAN / 2 + (seat + 0.5) * step,
+      radius: row.radius,
+      y: row.y,
+    }));
+  });
+
+export const gallerySeatEstimate = () =>
+  galleryRows().reduce((total, row) => total + row.seats, 0);
+
+// Floor and gallery together, against the 312 the room was fitted with. This is
+// the whole point of generating the room rather than placing it.
+export const seatEstimate = () => floorSeatEstimate() + gallerySeatEstimate();

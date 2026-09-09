@@ -7,6 +7,7 @@ import {
   cameraMaxPolar,
   cameraReach,
   floorSeatEstimate,
+  gallerySeatEstimate,
 } from "./chamberPlan.js";
 
 const LOOK = [0, 1.5, 2.8];
@@ -50,10 +51,11 @@ const INTERIORS = {
     minReach: 3,
     radius: WALL_R,
     height: WALL_H,
-    // Seats the modelled floor actually holds. Printed next to the 312 the room
-    // was fitted with, as the cross-check chamberPlan asks for rather than as a
-    // claim about how the real chamber divides between floor and gallery.
+    // What the modelled room actually holds, floor and gallery apart. Printed
+    // beside the 312 it was fitted with, as the cross-check chamberPlan asks
+    // for — not as a claim about how the real chamber divides between the two.
     floorSeats: floorSeatEstimate(),
+    gallerySeats: gallerySeatEstimate(),
     ground: "#150b09",
   },
 };

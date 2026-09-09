@@ -35,6 +35,9 @@ const RAKE = -0.09;
 
 const X_AXIS = new THREE.Vector3(1, 0, 0);
 
+// Exported: the gallery seats the same way, and the instancing maths is the
+// same maths.
+//
 // A chair is around 170 copies of five small solids. Drawn individually that is
 // most of the draw calls in the chamber spent on its least interesting
 // furniture, so each part is one instanced mesh spanning every row at once — the
@@ -46,7 +49,7 @@ const X_AXIS = new THREE.Vector3(1, 0, 0);
 // a part needs an angle and a radial offset and nothing else. Tilted parts are
 // swung about the chair's own origin rather than their own centres, so a back
 // and the cap on top of it stay joined.
-function SeatPart({ seats, dy, dz, tilt = 0, children }) {
+export function SeatPart({ seats, dy, dz, tilt = 0, children }) {
   const ref = useRef();
 
   useLayoutEffect(() => {
