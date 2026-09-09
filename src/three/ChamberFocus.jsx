@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { SeatPart } from "./ChamberBenches.jsx";
-import { SEAT_H, SEAT_PITCH, seatPositions, speakingPlace } from "./chamberPlan.js";
+import { useChamber } from "./chamberContext.js";
 
 // What the sitting sequence points at.
 //
@@ -36,13 +36,14 @@ const GLOW = {
 // exactly why ChamberBenches gives it an oak cap in the first place. Lighting a
 // place now means that cap glowing, at the same offsets, so a lit chair is the
 // chair rather than something hovering near it.
-const CAP_RISE = SEAT_H + 0.59;
 const CAP_SET = -0.11;
 const RAKE = -0.09;
 
 function Places({ seats }) {
+  const { SEAT_H, SEAT_PITCH } = useChamber().plan;
+
   return (
-    <SeatPart seats={seats} dy={CAP_RISE} dz={CAP_SET} tilt={RAKE}>
+    <SeatPart seats={seats} dy={SEAT_H + 0.59} dz={CAP_SET} tilt={RAKE}>
       <boxGeometry args={[SEAT_PITCH * 0.76 + 0.05, 0.08, 0.135]} />
       <meshStandardMaterial {...GLOW} />
     </SeatPart>
@@ -56,8 +57,14 @@ const world = (seat) => [
 ];
 
 export default function ChamberFocus({ highlight }) {
-  const place = useMemo(() => speakingPlace(), []);
-  const floor = useMemo(() => seatPositions(), []);
+  const { plan } = useChamber();
+  const { seatPositions, speakingPlace, WALL_R } = plan;
+  const place = useMemo(() => speakingPlace(), [speakingPlace]);
+  const floor = useMemo(() => seatPositions(), [seatPositions]);
+  // The doors sit in the panelled elevation either side of the dais, and that
+  // elevation is a fraction of the wall rather than a fixed width — so in a
+  // bigger chamber they are further apart.
+  const doorX = WALL_R * 0.5;
 
   if (highlight === "member") {
     const [x, y, z] = world(place);
@@ -84,7 +91,7 @@ export default function ChamberFocus({ highlight }) {
         {[-1, 1].map((dir) => (
           <pointLight
             key={dir}
-            position={[dir * 6.35, 2.4, 0.9]}
+            position={[dir * doorX, 2.4, 0.9]}
             intensity={26}
             distance={7}
             color="#e8f0ff"

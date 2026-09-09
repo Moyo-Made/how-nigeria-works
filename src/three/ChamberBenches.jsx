@@ -1,18 +1,8 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
-import { BAIZE_RED, BRASS, CHARCOAL, OAK, OAK_SHADE } from "./materials.js";
 import CurvedDesk from "./CurvedDesk.jsx";
-import {
-  BENCH_DEPTH,
-  BENCH_H,
-  BENCH_LIP,
-  SEAT_H,
-  SEAT_PITCH,
-  rowBlocks,
-  rows,
-  seatPositions,
-} from "./chamberPlan.js";
+import { useChamber } from "./chamberContext.js";
 
 // The members' side of the room: one continuous desk arc per row, and a chair
 // for every seat the plan says fits behind it.
@@ -23,7 +13,10 @@ import {
 // the chairs and the seat count all move together.
 
 const DESK_SEGMENTS = 56;
-const SEAT_W = SEAT_PITCH * 0.76; // leaves a real gap between neighbours
+
+// Leaves a real gap between neighbours. A fraction of the pitch rather than a
+// width, so it holds in either chamber.
+const seatWidth = (SEAT_PITCH) => SEAT_PITCH * 0.76;
 
 // How far a chair may lean back before it fouls the desk of the row behind. The
 // row pitch leaves about 0.57 m between the back of one desk and the riser of
@@ -93,6 +86,9 @@ export function SeatPart({ seats, dy, dz, tilt = 0, children }) {
 // Every arc in this room is concentric, so a block is drawn centred and then
 // turned to its own bearing — the desks stay the same component at every radius.
 function BenchRow({ radius, y }) {
+  const { plan, palette } = useChamber();
+  const { BENCH_H, BENCH_DEPTH, BENCH_LIP, rowBlocks } = plan;
+
   return rowBlocks(radius).map((block, index) => (
     <group key={index} rotation={[0, (block.start + block.end) / 2, 0]}>
       <CurvedDesk
@@ -102,9 +98,9 @@ function BenchRow({ radius, y }) {
         depth={BENCH_DEPTH}
         lip={BENCH_LIP}
         y={y}
-        face={OAK_SHADE}
-        back={OAK}
-        top={OAK}
+        face={palette.oakShade}
+        back={palette.oak}
+        top={palette.oak}
         segments={DESK_SEGMENTS}
       />
     </group>
@@ -112,7 +108,10 @@ function BenchRow({ radius, y }) {
 }
 
 export default function ChamberBenches() {
-  const seats = useMemo(() => seatPositions(), []);
+  const { plan, palette } = useChamber();
+  const { BENCH_H, SEAT_H, SEAT_PITCH, rows, seatPositions } = plan;
+  const seats = useMemo(() => seatPositions(), [seatPositions]);
+  const SEAT_W = seatWidth(SEAT_PITCH);
 
   return (
     <group>
@@ -124,17 +123,17 @@ export default function ChamberBenches() {
           part company on a row the rake has shifted */}
       <SeatPart seats={seats} dy={SEAT_H - 0.27} dz={0}>
         <cylinderGeometry args={[0.05, 0.08, 0.36, 10]} />
-        <meshStandardMaterial {...CHARCOAL} />
+        <meshStandardMaterial {...palette.charcoal} />
       </SeatPart>
 
       <SeatPart seats={seats} dy={SEAT_H - 0.05} dz={0}>
         <boxGeometry args={[SEAT_W, 0.1, 0.44]} />
-        <meshStandardMaterial {...BAIZE_RED} />
+        <meshStandardMaterial {...palette.baize} />
       </SeatPart>
 
       <SeatPart seats={seats} dy={SEAT_H + 0.28} dz={-0.11} tilt={RAKE}>
         <boxGeometry args={[SEAT_W, 0.56, 0.09]} />
-        <meshStandardMaterial {...BAIZE_RED} />
+        <meshStandardMaterial {...palette.baize} />
       </SeatPart>
 
       {/* oak cap along the top of the back — the one part of a chair that stays
@@ -142,14 +141,14 @@ export default function ChamberBenches() {
           them reading as rows of seats rather than a wall of red */}
       <SeatPart seats={seats} dy={SEAT_H + 0.59} dz={-0.11} tilt={RAKE}>
         <boxGeometry args={[SEAT_W + 0.03, 0.06, 0.11]} />
-        <meshStandardMaterial {...OAK} />
+        <meshStandardMaterial {...palette.oak} />
       </SeatPart>
 
       {/* a microphone stem per place. At this distance it is two centimetres of
           brass, but a chamber desk without one reads as a school hall. */}
       <SeatPart seats={seats} dy={BENCH_H + 0.11} dz={0.5}>
         <cylinderGeometry args={[0.008, 0.012, 0.22, 6]} />
-        <meshStandardMaterial {...BRASS} />
+        <meshStandardMaterial {...palette.brass} />
       </SeatPart>
     </group>
   );

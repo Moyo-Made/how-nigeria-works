@@ -1,19 +1,8 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 
-import { BAIZE_RED, BRASS, CARPET_RED, CARPET_SHADE, CHARCOAL, OAK, OAK_SHADE } from "./materials.js";
 import { SeatPart } from "./ChamberBenches.jsx";
-import {
-  GALLERY_FAN,
-  GALLERY_FRONT,
-  GALLERY_PARAPET,
-  GALLERY_RISE,
-  GALLERY_SLAB,
-  GALLERY_STEP,
-  SEAT_PITCH,
-  galleryRows,
-  gallerySeatPositions,
-} from "./chamberPlan.js";
+import { useChamber } from "./chamberContext.js";
 
 // The public gallery: a balcony over the rear of the seating, and the reason the
 // room now has a back.
@@ -28,17 +17,12 @@ import {
 // unfinished from any angle but the front.
 
 const SEGMENTS = 72;
-const HALF = GALLERY_FAN / 2;
-
-// Ring geometry measures its angle from +X where cylinder geometry measures from
-// +Z — the same quarter turn every arc in this room deals with.
-const RING_OFFSET = -HALF - Math.PI / 2;
-
-const SEAT_W = SEAT_PITCH * 0.74;
-const SOFFIT = GALLERY_RISE - GALLERY_SLAB;
 
 // A band of wall, drawn from whichever side it is meant to be read from.
 function Band({ radius, from, to, material, side = THREE.DoubleSide, segments = SEGMENTS }) {
+  const { GALLERY_FAN } = useChamber().plan;
+  const HALF = GALLERY_FAN / 2;
+
   return (
     <mesh position={[0, (from + to) / 2, 0]} receiveShadow castShadow>
       <cylinderGeometry args={[radius, radius, to - from, segments, 1, true, -HALF, GALLERY_FAN]} />
@@ -48,6 +32,11 @@ function Band({ radius, from, to, material, side = THREE.DoubleSide, segments = 
 }
 
 function Ring({ inner, outer, y, material, flip = false }) {
+  const { GALLERY_FAN } = useChamber().plan;
+  // Ring geometry measures its angle from +X where cylinder geometry measures
+  // from +Z — the same quarter turn every arc in this room deals with.
+  const RING_OFFSET = -GALLERY_FAN / 2 - Math.PI / 2;
+
   return (
     <mesh position={[0, y, 0]} rotation={[flip ? Math.PI / 2 : -Math.PI / 2, 0, 0]} receiveShadow>
       <ringGeometry args={[inner, outer, SEGMENTS, 1, RING_OFFSET, GALLERY_FAN]} />
@@ -60,19 +49,23 @@ function Ring({ inner, outer, y, material, flip = false }) {
 // to the floor of the House — is most of what anyone sees of it. A lit soffit
 // and a deep fascia, rather than the bare edge of a slab.
 function Structure() {
+  const { plan, palette } = useChamber();
+  const { GALLERY_FAN, GALLERY_FRONT, GALLERY_RISE, GALLERY_SLAB, galleryRows } = plan;
+  const HALF = GALLERY_FAN / 2;
+  const SOFFIT = GALLERY_RISE - GALLERY_SLAB;
   const back = galleryRows().at(-1).treadOuter;
 
   return (
     <group>
-      <Band radius={GALLERY_FRONT} from={SOFFIT} to={GALLERY_RISE} material={OAK_SHADE} />
-      <Ring inner={GALLERY_FRONT} outer={back} y={SOFFIT} material={CHARCOAL} flip />
+      <Band radius={GALLERY_FRONT} from={SOFFIT} to={GALLERY_RISE} material={palette.oakShade} />
+      <Ring inner={GALLERY_FRONT} outer={back} y={SOFFIT} material={palette.charcoal} flip />
 
       {/* A brass reveal along the bottom of the fascia. It is the only thing at
           this height catching the light off the floor, and without it the
           balcony reads as a shadow with no edge. */}
       <mesh position={[0, SOFFIT + 0.06, 0]}>
         <cylinderGeometry args={[GALLERY_FRONT + 0.03, GALLERY_FRONT + 0.03, 0.05, SEGMENTS, 1, true, -HALF, GALLERY_FAN]} />
-        <meshStandardMaterial {...BRASS} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...palette.brass} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -81,6 +74,10 @@ function Structure() {
 // Same construction as the floor tiers: a riser and a tread per row, stepped so
 // the rake reads as steps under even light rather than flattening into one field.
 function Tiers() {
+  const { plan, palette } = useChamber();
+  const { GALLERY_FAN, GALLERY_STEP, galleryRows } = plan;
+  const HALF = GALLERY_FAN / 2;
+
   return (
     <group>
       {galleryRows().map(({ index, y, treadInner, treadOuter }) => (
@@ -94,10 +91,10 @@ function Tiers() {
               <cylinderGeometry
                 args={[treadInner, treadInner, GALLERY_STEP, SEGMENTS, 1, true, -HALF, GALLERY_FAN]}
               />
-              <meshStandardMaterial {...CARPET_SHADE} side={THREE.DoubleSide} />
+              <meshStandardMaterial {...palette.carpetShade} side={THREE.DoubleSide} />
             </mesh>
           )}
-          <Ring inner={treadInner} outer={treadOuter} y={y} material={CARPET_RED} />
+          <Ring inner={treadInner} outer={treadOuter} y={y} material={palette.carpet} />
         </group>
       ))}
     </group>
@@ -107,11 +104,14 @@ function Tiers() {
 // The parapet. Its height is the constraint that fixes the gallery's own rake:
 // low enough to see the floor over from the front row, high enough to lean on.
 function Parapet() {
+  const { plan, palette } = useChamber();
+  const { GALLERY_FAN, GALLERY_FRONT, GALLERY_RISE, GALLERY_PARAPET } = plan;
+  const HALF = GALLERY_FAN / 2;
   const top = GALLERY_RISE + GALLERY_PARAPET;
 
   return (
     <group>
-      <Band radius={GALLERY_FRONT} from={GALLERY_RISE} to={top} material={OAK} />
+      <Band radius={GALLERY_FRONT} from={GALLERY_RISE} to={top} material={palette.oak} />
       {/* The coping has to be open-ended. A closed cylinder caps its ends, and
           on a 178-degree arc at this radius those caps are pie slices struck
           from the room's own axis — a solid lid across half the chamber at
@@ -121,10 +121,10 @@ function Parapet() {
         <cylinderGeometry
           args={[GALLERY_FRONT + 0.06, GALLERY_FRONT + 0.06, 0.07, SEGMENTS, 1, true, -HALF, GALLERY_FAN]}
         />
-        <meshStandardMaterial {...OAK_SHADE} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...palette.oakShade} side={THREE.DoubleSide} />
       </mesh>
       {/* the flat of the rail, which the open band no longer provides */}
-      <Ring inner={GALLERY_FRONT} outer={GALLERY_FRONT + 0.06} y={top + 0.065} material={OAK_SHADE} />
+      <Ring inner={GALLERY_FRONT} outer={GALLERY_FRONT + 0.06} y={top + 0.065} material={palette.oakShade} />
     </group>
   );
 }
@@ -132,23 +132,26 @@ function Parapet() {
 // Gallery seats are seats and nothing else — no desk, no microphone, no place to
 // put a paper. The people up here are watching, not sitting.
 function Seats() {
-  const seats = useMemo(() => gallerySeatPositions(), []);
+  const { plan, palette } = useChamber();
+  const { SEAT_PITCH, gallerySeatPositions } = plan;
+  const seats = useMemo(() => gallerySeatPositions(), [gallerySeatPositions]);
+  const SEAT_W = SEAT_PITCH * 0.74;
 
   return (
     <group>
       <SeatPart seats={seats} dy={0.2} dz={0}>
         <boxGeometry args={[SEAT_W * 0.5, 0.4, 0.1]} />
-        <meshStandardMaterial {...CHARCOAL} />
+        <meshStandardMaterial {...palette.charcoal} />
       </SeatPart>
 
       <SeatPart seats={seats} dy={0.44} dz={0}>
         <boxGeometry args={[SEAT_W, 0.09, 0.4]} />
-        <meshStandardMaterial {...BAIZE_RED} />
+        <meshStandardMaterial {...palette.baize} />
       </SeatPart>
 
       <SeatPart seats={seats} dy={0.72} dz={-0.16} tilt={-0.08}>
         <boxGeometry args={[SEAT_W, 0.48, 0.08]} />
-        <meshStandardMaterial {...BAIZE_RED} />
+        <meshStandardMaterial {...palette.baize} />
       </SeatPart>
     </group>
   );

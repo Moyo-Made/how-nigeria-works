@@ -1,31 +1,22 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
-import {
-  OAK,
-  OAK_SHADE,
-  OAK_PALE,
-  BAY_WOOD,
-  BAIZE_RED,
-  CARPET_RED,
-  CHARCOAL,
-  BRASS,
-} from "./materials.js";
 import ChamberTiers from "./ChamberTiers.jsx";
 import ChamberBenches from "./ChamberBenches.jsx";
 import ChamberFocus from "./ChamberFocus.jsx";
 import ChamberGallery from "./ChamberGallery.jsx";
 import CurvedDesk from "./CurvedDesk.jsx";
-import {
-  BACK_WALL_HALF,
-  CLERKS_R,
-  DAIS_LIFT,
-  DAIS_R,
-  HALF_FAN,
-  WALL_H,
-  WALL_R,
-} from "./chamberPlan.js";
+import { useChamber } from "./chamberContext.js";
 
+// A chamber of the National Assembly. One component draws either of them.
+//
+// The Senate and the House are mirror-image halls of one design and their dais
+// photography matches element for element, which is what makes a single
+// component defensible: what differs between the rooms is their size and the
+// colour of the dyed wool, and both of those arrive through context. Building
+// the Green Chamber as its own file would have meant maintaining two copies of
+// one room and discovering the divergence only by looking at both.
+//
 // The chamber the app models is the one rebuilt in 2024, not the one in most
 // photographs of it. The old concrete tier was demolished outright and the
 // seats, desks, carpet and acoustic walls all replaced, so anything shot before
@@ -46,6 +37,7 @@ const arcStart = (halfAngle) => -halfAngle;
 // separate meshes that is a few hundred draw calls for a surface nobody ever
 // looks at straight on.
 function Fluting({ x, z, width, height, y = 0, pitch = 0.17 }) {
+  const { palette } = useChamber();
   const ref = useRef();
   const count = Math.max(1, Math.floor(width / pitch));
 
@@ -61,7 +53,7 @@ function Fluting({ x, z, width, height, y = 0, pitch = 0.17 }) {
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, count]} castShadow receiveShadow>
       <boxGeometry args={[pitch * 0.5, height, 0.14]} />
-      <meshStandardMaterial {...OAK_PALE} />
+      <meshStandardMaterial {...palette.oakPale} />
     </instancedMesh>
   );
 }
@@ -126,14 +118,21 @@ function CoatOfArms({ size = 2.75 }) {
 // pale fluted acoustic panelling outboard of those, charcoal panels at high
 // level, and a door at the base of each fluted bay.
 function DaisWall() {
+  const { plan, palette } = useChamber();
+  const { BACK_WALL_HALF, WALL_H, WALL_R } = plan;
+
   // The panelled elevation is a composition in its own right, not cladding run
   // wall to wall: it stops short of the curved wall either side, which is what
   // the reference shows and what keeps the doors and the fluted bays inside the
   // frame from anywhere on the floor.
-  const half = 8.0;
-  const panelTop = 7.4;
-  const bayHalf = 3.3;
-  const pilaster = 0.7;
+  //
+  // Its proportions are fractions of the room rather than fixed widths, so the
+  // same composition holds in a chamber half again as wide. The doors are the
+  // exception and stay in metres: a door is the size of a person either way.
+  const half = WALL_R * 0.625;
+  const panelTop = WALL_H * 0.643;
+  const bayHalf = WALL_R * 0.258;
+  const pilaster = WALL_R * 0.055;
   const flutedInner = bayHalf + pilaster * 2;
   const flutedWidth = half - flutedInner;
   const flutedMid = flutedInner + flutedWidth / 2;
@@ -144,13 +143,13 @@ function DaisWall() {
           front of it does not — so the dais end of the room stays closed. */}
       <mesh position={[0, WALL_H / 2, -0.12]} receiveShadow>
         <boxGeometry args={[BACK_WALL_HALF * 2, WALL_H, 0.24]} />
-        <meshStandardMaterial {...OAK_PALE} />
+        <meshStandardMaterial {...palette.oakPale} />
       </mesh>
 
       {/* central book-matched bay */}
       <mesh position={[0, panelTop / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[bayHalf * 2, panelTop, 0.16]} />
-        <meshStandardMaterial {...BAY_WOOD} />
+        <meshStandardMaterial {...palette.bay} />
       </mesh>
 
       {/* pilasters */}
@@ -162,7 +161,7 @@ function DaisWall() {
           receiveShadow
         >
           <boxGeometry args={[pilaster * 2, panelTop, 0.22]} />
-          <meshStandardMaterial {...OAK} />
+          <meshStandardMaterial {...palette.oak} />
         </mesh>
       ))}
 
@@ -171,12 +170,12 @@ function DaisWall() {
         <group key={dir}>
           <mesh position={[dir * flutedMid, panelTop / 2, -0.04]} receiveShadow>
             <boxGeometry args={[flutedWidth, panelTop, 0.1]} />
-            <meshStandardMaterial {...OAK_PALE} />
+            <meshStandardMaterial {...palette.oakPale} />
           </mesh>
           <Fluting x={dir * flutedMid} z={0.04} width={flutedWidth} height={panelTop} />
           <mesh position={[dir * flutedMid, panelTop + 1.1, 0]} receiveShadow>
             <boxGeometry args={[flutedWidth, 2.0, 0.12]} />
-            <meshStandardMaterial {...CHARCOAL} />
+            <meshStandardMaterial {...palette.charcoal} />
           </mesh>
         </group>
       ))}
@@ -185,12 +184,12 @@ function DaisWall() {
       {[-1, 1].map((dir) => (
         <mesh key={dir} position={[dir * flutedMid, 1.35, 0.14]} castShadow>
           <boxGeometry args={[1.7, 2.7, 0.12]} />
-          <meshStandardMaterial {...OAK} />
+          <meshStandardMaterial {...palette.oak} />
         </mesh>
       ))}
 
-      <group position={[0, 5.1, 0.14]}>
-        <CoatOfArms />
+      <group position={[0, WALL_H * 0.443, 0.14]}>
+        <CoatOfArms size={WALL_R * 0.215} />
       </group>
     </group>
   );
@@ -210,6 +209,8 @@ const CHAIR_SEAT = 0.48;
 const DESK_OVER_SEAT = 0.3;
 
 function Dais() {
+  const { plan, palette } = useChamber();
+  const { DAIS_R, DAIS_LIFT, HALF_FAN } = plan;
   const deskH = CHAIR_SEAT + DESK_OVER_SEAT;
   const platformHalf = HALF_FAN * 0.42;
 
@@ -220,7 +221,7 @@ function Dais() {
         <cylinderGeometry
           args={[DAIS_R + 0.9, DAIS_R + 0.9, DAIS_LIFT, 48, 1, false, arcStart(platformHalf), platformHalf * 2]}
         />
-        <meshStandardMaterial {...OAK} />
+        <meshStandardMaterial {...palette.oak} />
       </mesh>
 
       {/* two steps up to the platform, so the dais is stood on rather than
@@ -235,7 +236,7 @@ function Dais() {
             <cylinderGeometry
               args={[radius, radius, rise, 48, 1, false, arcStart(platformHalf * 0.94), platformHalf * 1.88]}
             />
-            <meshStandardMaterial {...OAK_SHADE} />
+            <meshStandardMaterial {...palette.oakShade} />
           </mesh>
         );
       })}
@@ -247,15 +248,15 @@ function Dais() {
         depth={0.44}
         lip={0.16}
         y={DAIS_LIFT}
-        face={BAIZE_RED}
-        back={OAK_SHADE}
-        top={OAK}
+        face={palette.baize}
+        back={palette.oakShade}
+        top={palette.oak}
       />
       <mesh position={[0, DAIS_LIFT + deskH + 0.22, 0]}>
         <cylinderGeometry
           args={[DAIS_R + 0.16, DAIS_R + 0.16, 0.05, 32, 1, true, arcStart(platformHalf * 0.82), platformHalf * 1.64]}
         />
-        <meshStandardMaterial {...BRASS} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...palette.brass} side={THREE.DoubleSide} />
       </mesh>
 
       {/* roundel on the desk front. In the Senate this reads "The President of
@@ -263,7 +264,7 @@ function Dais() {
           Speaker. Lettering is left off rather than faked at this resolution. */}
       <mesh position={[0, DAIS_LIFT + deskH * 0.55, DAIS_R + 0.02]} castShadow>
         <cylinderGeometry args={[0.34, 0.34, 0.04, 32]} />
-        <meshStandardMaterial {...BRASS} />
+        <meshStandardMaterial {...palette.brass} />
       </mesh>
 
       <PresidingChair />
@@ -272,38 +273,40 @@ function Dais() {
 }
 
 function PresidingChair() {
+  const { plan, palette } = useChamber();
+  const { DAIS_LIFT, DAIS_R } = plan;
   const seat = DAIS_LIFT + CHAIR_SEAT;
 
   return (
     <group position={[0, 0, DAIS_R - 1.5]}>
       <mesh position={[0, seat, 0]} castShadow>
         <boxGeometry args={[0.82, 0.16, 0.72]} />
-        <meshStandardMaterial {...BAIZE_RED} />
+        <meshStandardMaterial {...palette.baize} />
       </mesh>
       {/* A tall upholstered back rising well above the desk, so the chair still
           reads as the seat of the chair from the floor of the House. */}
       <mesh position={[0, seat + 0.78, -0.32]} castShadow>
         <boxGeometry args={[0.86, 1.42, 0.18]} />
-        <meshStandardMaterial {...BAIZE_RED} />
+        <meshStandardMaterial {...palette.baize} />
       </mesh>
       <mesh position={[0, seat + 1.56, -0.32]} castShadow>
         <boxGeometry args={[0.86, 0.24, 0.22]} />
-        <meshStandardMaterial {...OAK} />
+        <meshStandardMaterial {...palette.oak} />
       </mesh>
       {/* the coat-of-arms roundel set into the headrest */}
       <mesh position={[0, seat + 1.22, -0.22]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.19, 0.19, 0.03, 24]} />
-        <meshStandardMaterial {...BRASS} />
+        <meshStandardMaterial {...palette.brass} />
       </mesh>
       {[-1, 1].map((dir) => (
         <mesh key={dir} position={[dir * 0.46, seat + 0.24, 0]} castShadow>
           <boxGeometry args={[0.1, 0.36, 0.62]} />
-          <meshStandardMaterial {...OAK} />
+          <meshStandardMaterial {...palette.oak} />
         </mesh>
       ))}
       <mesh position={[0, seat - 0.26, 0]} castShadow>
         <boxGeometry args={[0.5, 0.38, 0.5]} />
-        <meshStandardMaterial {...OAK} />
+        <meshStandardMaterial {...palette.oak} />
       </mesh>
     </group>
   );
@@ -318,6 +321,8 @@ function PresidingChair() {
 // Built along Y because that is the axis every cylinder here is native to, then
 // laid on its side, the way it rests on the table between sittings.
 function Mace({ length = 0.92, lit = false }) {
+  const { palette } = useChamber();
+  const BRASS = palette.brass;
   const shaft = length * 0.58;
   // Lit, it is the same brass with the light turned up inside it rather than a
   // different object. The mace is the one thing in this room whose presence is
@@ -367,6 +372,8 @@ function Mace({ length = 0.92, lit = false }) {
 // Directly below and in front of the dais: oak, with a baize inset top and the
 // brass stanchions that cradle the mace.
 function ClerksTable({ maceLit }) {
+  const { plan, palette } = useChamber();
+  const { CLERKS_R } = plan;
   const height = 0.78;
   const depth = 0.8;
   const halfAngle = 0.26;
@@ -380,9 +387,9 @@ function ClerksTable({ maceLit }) {
         height={height}
         depth={depth}
         lip={0.07}
-        face={OAK}
-        back={OAK_SHADE}
-        top={OAK}
+        face={palette.oak}
+        back={palette.oakShade}
+        top={palette.oak}
         segments={32}
       />
 
@@ -398,7 +405,7 @@ function ClerksTable({ maceLit }) {
             halfAngle * 1.72,
           ]}
         />
-        <meshStandardMaterial {...BAIZE_RED} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...palette.baize} side={THREE.DoubleSide} />
       </mesh>
 
       {/* the cradle: two stanchions with saddles, and the mace across them */}
@@ -406,11 +413,11 @@ function ClerksTable({ maceLit }) {
         <group key={dir} position={[dir * 0.34, 0, CLERKS_R - 0.06]}>
           <mesh position={[0, height + 0.055, 0]} castShadow>
             <cylinderGeometry args={[0.022, 0.03, 0.11, 12]} />
-            <meshStandardMaterial {...BRASS} />
+            <meshStandardMaterial {...palette.brass} />
           </mesh>
           <mesh position={[0, height + 0.115, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
             <torusGeometry args={[0.036, 0.011, 8, 16, Math.PI]} />
-            <meshStandardMaterial {...BRASS} />
+            <meshStandardMaterial {...palette.brass} />
           </mesh>
         </group>
       ))}
@@ -426,34 +433,37 @@ function ClerksTable({ maceLit }) {
 // panelled elevation. The curved wall is drawn from the inside, so it is a
 // single open-ended cylinder with its faces flipped rather than a solid.
 function Shell() {
+  const { plan, palette } = useChamber();
+  const { WALL_H, WALL_R } = plan;
+
   return (
     <group>
       <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[WALL_R, WALL_SEGMENTS]} />
-        <meshStandardMaterial {...CARPET_RED} />
+        <meshStandardMaterial {...palette.carpet} />
       </mesh>
 
       <mesh position={[0, WALL_H / 2, 0]}>
         <cylinderGeometry args={[WALL_R, WALL_R, WALL_H, WALL_SEGMENTS, 1, true]} />
-        <meshStandardMaterial {...OAK_PALE} side={THREE.BackSide} />
+        <meshStandardMaterial {...palette.oakPale} side={THREE.BackSide} />
       </mesh>
 
       <mesh position={[0, WALL_H, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <circleGeometry args={[WALL_R, WALL_SEGMENTS]} />
-        <meshStandardMaterial {...CHARCOAL} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...palette.charcoal} side={THREE.DoubleSide} />
       </mesh>
 
       {/* a plain skirt around the base of the curved wall, so the carpet does
           not run straight into the panelling */}
       <mesh position={[0, 0.22, 0]}>
         <cylinderGeometry args={[WALL_R - 0.02, WALL_R - 0.02, 0.44, WALL_SEGMENTS, 1, true]} />
-        <meshStandardMaterial {...OAK} side={THREE.BackSide} />
+        <meshStandardMaterial {...palette.oak} side={THREE.BackSide} />
       </mesh>
     </group>
   );
 }
 
-export default function SenateChamber({ highlight = null, ...props }) {
+export default function Chamber({ highlight = null, ...props }) {
   return (
     <group {...props}>
       <Shell />

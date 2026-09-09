@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
 import ChamberRig from "../three/ChamberRig.jsx";
+import { ChamberContext } from "../three/chamberContext.js";
 import ChamberSitting from "../three/ChamberSitting.jsx";
 import { getInterior } from "../three/chamberRegistry.js";
 import { getChamber } from "../data/chambers.js";
@@ -85,7 +86,8 @@ export default function ChamberView({ id }) {
 
   if (!interior) return <NoRoom chamber={chamber} id={id} />;
 
-  const { Component, eye, look, fov, reach, minReach, halfSweep, maxPolar } = interior;
+  const { Component, plan, palette, eye, look, fov, reach, minReach, halfSweep, maxPolar } =
+    interior;
   const { radius, height, floorSeats, gallerySeats, seats, ground } = interior;
 
   const current = sitting ? stages[stage] : null;
@@ -111,21 +113,27 @@ export default function ChamberView({ id }) {
           gl={{ antialias: true }}
         >
           <color attach="background" args={[ground]} />
-          <ChamberRig dim={current?.highlight === "empty"} />
 
-          <Suspense fallback={null}>
-            <Component highlight={current?.highlight ?? null} />
-          </Suspense>
+          {/* The provider sits inside the Canvas so the R3F tree can read it:
+              every piece of geometry below asks context which room it is in
+              rather than being told by whoever rendered it. */}
+          <ChamberContext.Provider value={{ plan, palette }}>
+            <ChamberRig dim={current?.highlight === "empty"} />
 
-          {sitting && (
-            <ChamberSitting
-              fov={fov}
-              stages={stages}
-              index={stage}
-              playing={playing}
-              onAdvance={() => setStage((s) => s + 1)}
-            />
-          )}
+            <Suspense fallback={null}>
+              <Component highlight={current?.highlight ?? null} />
+            </Suspense>
+
+            {sitting && (
+              <ChamberSitting
+                fov={fov}
+                stages={stages}
+                index={stage}
+                playing={playing}
+                onAdvance={() => setStage((s) => s + 1)}
+              />
+            )}
+          </ChamberContext.Provider>
 
           {/* The eye is fenced into the part of the room that was built. Every
               limit comes off the room's own plan rather than being tuned here —

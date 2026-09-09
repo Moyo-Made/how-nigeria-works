@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
-import { speakingPlace } from "./chamberPlan.js";
+import { useChamber } from "./chamberContext.js";
 
 const spherical = new THREE.Spherical();
 const offset = new THREE.Vector3();
@@ -40,7 +40,8 @@ export default function ChamberSitting({ stages, index, playing, fov, onAdvance 
   const elapsed = useRef(0);
   const aim = useRef(new THREE.Vector3());
 
-  const place = useMemo(() => speakingPlace(), []);
+  const { speakingPlace } = useChamber().plan;
+  const place = useMemo(() => speakingPlace(), [speakingPlace]);
   const stage = stages[index];
   const last = index === stages.length - 1;
 

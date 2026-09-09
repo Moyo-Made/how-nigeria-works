@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
-import { CARPET_RED, CARPET_SHADE } from "./materials.js";
-import { FAN, HALF_FAN, RETURN_W, ROW_RISE, rows } from "./chamberPlan.js";
+import { useChamber } from "./chamberContext.js";
 
 // The tiered floor of the chamber, generated from chamberPlan rather than placed.
 //
@@ -16,23 +15,25 @@ import { FAN, HALF_FAN, RETURN_W, ROW_RISE, rows } from "./chamberPlan.js";
 
 const SEGMENTS = 64;
 
-// Ring geometry measures its angle from +X where cylinder geometry measures from
-// +Z — the same quarter turn the desks deal with.
-const RING_OFFSET = -HALF_FAN - Math.PI / 2;
-
 function Tier({ inner, outer, y }) {
+  const { plan, palette } = useChamber();
+  const { FAN, HALF_FAN, ROW_RISE } = plan;
+  // Ring geometry measures its angle from +X where cylinder geometry measures
+  // from +Z — the same quarter turn the desks deal with.
+  const RING_OFFSET = -HALF_FAN - Math.PI / 2;
+
   return (
     <group>
       {/* the step up to this row */}
       <mesh position={[0, y - ROW_RISE / 2, 0]} receiveShadow castShadow>
         <cylinderGeometry args={[inner, inner, ROW_RISE, SEGMENTS, 1, true, -HALF_FAN, FAN]} />
-        <meshStandardMaterial {...CARPET_SHADE} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...palette.carpetShade} side={THREE.DoubleSide} />
       </mesh>
 
       {/* the floor of it */}
       <mesh position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <ringGeometry args={[inner, outer, SEGMENTS, 1, RING_OFFSET, FAN]} />
-        <meshStandardMaterial {...CARPET_RED} side={THREE.DoubleSide} />
+        <meshStandardMaterial {...palette.carpet} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -46,6 +47,9 @@ function Tier({ inner, outer, y }) {
 // A group rotated about Y puts the box's local +Z along the radius, which is the
 // same convention the arcs are laid out in — no angle conversion needed.
 function Return({ angle }) {
+  const { plan, palette } = useChamber();
+  const { RETURN_W, rows } = plan;
+
   return (
     <group rotation={[0, angle, 0]}>
       {rows().map(({ index, y, treadInner, treadOuter }) => (
@@ -56,7 +60,7 @@ function Return({ angle }) {
           castShadow
         >
           <boxGeometry args={[RETURN_W, y, treadOuter - treadInner]} />
-          <meshStandardMaterial {...CARPET_SHADE} />
+          <meshStandardMaterial {...palette.carpetShade} />
         </mesh>
       ))}
     </group>
@@ -64,6 +68,9 @@ function Return({ angle }) {
 }
 
 export default function ChamberTiers() {
+  const { plan } = useChamber();
+  const { HALF_FAN, rows } = plan;
+
   return (
     <group>
       {rows().map(({ index, y, treadInner, treadOuter }) => (
