@@ -3,6 +3,10 @@ import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
+import { getChamber } from "../data/chambers.js";
+import { preloadInterior } from "./chamberRegistry.js";
+import { toChamber } from "../hooks/useHashRoute.js";
+
 const raycaster = new THREE.Raycaster();
 const anchorWorld = new THREE.Vector3();
 const direction = new THREE.Vector3();
@@ -11,6 +15,32 @@ const direction = new THREE.Vector3();
 // side of the axis and still be in plain sight (the rock behind the Villa), or
 // on the near side and hidden behind a portico.
 const CHECK_EVERY = 4;
+
+// A hotspot that names a room the app models offers a door into it. The link
+// belongs on the card rather than on the marker: the marker is a numbered
+// annotation on the outside of a building, and turning some of them into
+// doorways and not others would make the numbering mean two things at once.
+//
+// The unbuilt chamber is still offered, the way the rail still lists an unbuilt
+// institution — the reader learns the room exists and why it is not here yet,
+// which is more use than a card that quietly stops short.
+function Interior({ id }) {
+  const chamber = getChamber(id);
+  if (!chamber) return null;
+
+  const built = chamber.status === "complete";
+
+  return (
+    <button
+      className="hotspot-go"
+      data-soon={!built || undefined}
+      onPointerEnter={built ? () => preloadInterior(id) : undefined}
+      onClick={() => toChamber(id)}
+    >
+      {built ? "Step inside" : "Interior coming soon"} &rarr;
+    </button>
+  );
+}
 
 function Hotspot({ hotspot, index, open, occludes, onOpen, onClose }) {
   const anchor = useRef();
@@ -65,6 +95,7 @@ function Hotspot({ hotspot, index, open, occludes, onOpen, onClose }) {
               </button>
               <h2>{hotspot.label}</h2>
               <p>{hotspot.blurb}</p>
+              {hotspot.interior && <Interior id={hotspot.interior} />}
             </div>
           )}
         </div>

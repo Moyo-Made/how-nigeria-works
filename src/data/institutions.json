@@ -54,6 +54,7 @@
     "hotspots": [
       {
         "id": "senate",
+        "interior": "senate",
         "label": "The Senate (Red Chamber)",
         "blurb": "109 senators. Every state sends three, regardless of size, so a small state has the same voice here as a large one. The Red Chamber is inside the central building, on the eastern side of the atrium.",
         "position": [
@@ -64,6 +65,7 @@
       },
       {
         "id": "house",
+        "interior": "house",
         "label": "House of Representatives (Green Chamber)",
         "blurb": "360 members elected from federal constituencies drawn by population, so busier areas hold more seats. The Green Chamber is in the same central building, on the western side of the atrium.",
         "position": [

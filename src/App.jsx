@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { useHashRoute, toInstitution } from "./hooks/useHashRoute.js";
 import { getInstitution, institutions, officeHoldersAsOf } from "./data/institutions.js";
+import { getChamber } from "./data/chambers.js";
 import Rail from "./components/Rail.jsx";
 import Confluence from "./components/Confluence.jsx";
 import ExploreCards from "./components/ExploreCards.jsx";
@@ -8,6 +9,7 @@ import ContentPanel from "./components/ContentPanel.jsx";
 
 // Keeps three.js out of the first paint entirely.
 const SpecimenView = lazy(() => import("./components/SpecimenView.jsx"));
+const ChamberView = lazy(() => import("./components/ChamberView.jsx"));
 
 const FIRST = institutions.find((i) => i.status === "complete");
 
@@ -42,8 +44,13 @@ function NotBuilt({ institution }) {
 }
 
 export default function App() {
-  const { id } = useHashRoute();
-  const institution = getInstitution(id) ?? FIRST;
+  const { route, id } = useHashRoute();
+  const inChamber = route === "chamber";
+  // Inside a chamber the rail still points at the building the room is in. You
+  // are in the National Assembly when you are in the Senate, and the highlight
+  // saying so is also the way back out.
+  const chamber = inChamber ? getChamber(id) : null;
+  const institution = getInstitution(inChamber ? chamber?.institution : id) ?? FIRST;
   const built = institution.status === "complete";
 
   // Lifted out of the specimen so the toolbar and the cards below the well can
@@ -73,7 +80,11 @@ export default function App() {
       <div className="workspace">
         <Rail currentId={institution.id} />
 
-        {built ? (
+        {inChamber ? (
+          <Suspense fallback={<StagePlaceholder label="Preparing the chamber…" />}>
+            <ChamberView id={id} />
+          </Suspense>
+        ) : built ? (
           <Suspense fallback={<StagePlaceholder label="Preparing the model…" />}>
             <SpecimenView
               institution={institution}
@@ -92,7 +103,7 @@ export default function App() {
         )}
       </div>
 
-      {built && (
+      {built && !inChamber && (
         <ExploreCards
           institution={institution}
           onPlayAnimation={() => setPlayRequest((n) => n + 1)}

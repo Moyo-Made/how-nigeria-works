@@ -1,0 +1,72 @@
+import { lazy } from "react";
+
+import {
+  WALL_H,
+  WALL_R,
+  cameraHalfSweep,
+  cameraMaxPolar,
+  cameraReach,
+  floorSeatEstimate,
+} from "./chamberPlan.js";
+
+const LOOK = [0, 1.5, 2.8];
+const REACH = cameraReach(LOOK);
+const MAX_POLAR = cameraMaxPolar(LOOK, REACH);
+
+// One entry per modelled interior: the geometry chunk, and the facts about the
+// room a camera needs in order to stand inside it.
+//
+// The camera and the extents live here rather than in ChamberView because they
+// are properties of the room, not of the viewer. The Green Chamber is about
+// twice the Senate's floor area and will want its own eye, its own clamp and its
+// own plan module; ChamberView should not have to know which room it is showing
+// in order to frame it.
+//
+// Which chambers are *built* is stated once, in chambers.json, and this map
+// follows it. Same split as institutions.json and registry.js: the data file
+// carries the claim, the registry carries the geometry.
+const INTERIORS = {
+  senate: {
+    load: () => import("./SenateChamber.jsx"),
+    // Three-quarter from the floor of the House. Dead-on holds the dais
+    // elevation nicely but flattens the rake to a set of faint rings, because
+    // looking straight down a tiered bank hides every riser behind the tread in
+    // front of it. Off-axis costs a little symmetry and buys the shape of the
+    // room.
+    // Pulled in from where it used to sit: the old eye stood 8.87 m off the
+    // target, which is further than the room now lets a camera go, so
+    // OrbitControls would have hauled it in on the first frame.
+    eye: [3.5, 4.5, 9.8],
+    look: LOOK,
+    // The fence, all of it derived in chamberPlan from the room's own numbers.
+    // Nothing here is a tuned angle.
+    reach: REACH,
+    halfSweep: cameraHalfSweep(LOOK, REACH, MAX_POLAR),
+    maxPolar: MAX_POLAR,
+    // Nearest the eye may get. Not a comfort setting: the target sits inside the
+    // dais platform, so a closer orbit swings the camera through the presiding
+    // chair at the wide end of the sweep and fills the screen with the inside of
+    // its upholstery.
+    minReach: 3,
+    radius: WALL_R,
+    height: WALL_H,
+    // Seats the modelled floor actually holds. Printed next to the 312 the room
+    // was fitted with, as the cross-check chamberPlan asks for rather than as a
+    // claim about how the real chamber divides between floor and gallery.
+    floorSeats: floorSeatEstimate(),
+    ground: "#150b09",
+  },
+};
+
+// lazy() must return the same component identity across renders, same as the
+// specimen registry.
+const wrapped = new Map();
+
+export function getInterior(id) {
+  const entry = INTERIORS[id];
+  if (!entry) return null;
+  if (!wrapped.has(id)) wrapped.set(id, lazy(entry.load));
+  return { ...entry, Component: wrapped.get(id) };
+}
+
+export const preloadInterior = (id) => INTERIORS[id]?.load();
