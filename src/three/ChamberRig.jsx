@@ -1,3 +1,4 @@
+import { doors } from "./chamberDoors.js";
 import { useChamber } from "./chamberContext.js";
 
 // The specimen rig lights an object standing in a dark studio. An interior is
@@ -17,7 +18,9 @@ import { useChamber } from "./chamberContext.js";
 const TUNED_AT = 12.8;
 
 export default function ChamberRig({ dim = false }) {
-  const { WALL_H, WALL_R } = useChamber().plan;
+  const { plan } = useChamber();
+  const { WALL_H, WALL_R, DAIS_WALL_Z } = plan;
+  const door = doors(plan);
   const level = dim ? 0.3 : 1;
   const k = WALL_R / TUNED_AT;
   const lamps = Math.round(6 * k);
@@ -69,9 +72,19 @@ export default function ChamberRig({ dim = false }) {
       <pointLight position={[0, 3.2 * k, 7.5 * k]} intensity={16 * k * k * level} distance={24 * k} decay={2} color="#ffe9d2" />
 
       {/* A cool sliver from the flanking doorways, so the dais wall does not
-          read as a single flat wash of warm light. */}
-      <pointLight position={[-WALL_R * 0.656, 2.2, 0.4]} intensity={9 * k * k * level} distance={9 * k} color="#cfe0ff" />
-      <pointLight position={[WALL_R * 0.656, 2.2, 0.4]} intensity={9 * k * k * level} distance={9 * k} color="#cfe0ff" />
+          read as a single flat wash of warm light. Stood at the doors and not
+          scaled with the room: a doorway is the same size in either chamber,
+          and a light sized for the room and placed by its radius ends up a
+          metre off the fluting, burning a hole in it. */}
+      {[-1, 1].map((dir) => (
+        <pointLight
+          key={dir}
+          position={[dir * door.x, door.base + 2.2, DAIS_WALL_Z + 2.2]}
+          intensity={6 * level}
+          distance={9}
+          color="#cfe0ff"
+        />
+      ))}
     </>
   );
 }

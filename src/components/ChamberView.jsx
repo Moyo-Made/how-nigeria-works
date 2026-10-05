@@ -11,11 +11,14 @@ import { getInstitution } from "../data/institutions.js";
 import { toInstitution } from "../hooks/useHashRoute.js";
 import SittingPlayer from "./SittingPlayer.jsx";
 import sittingStages from "../data/chamberSitting.json";
+import houseSittingStages from "../data/chamberSittingHouse.json";
 
 // Same shape as the specimen's animation table: the field is on the data, so a
 // second chamber can carry a different sequence without this file learning its
-// name.
-const ANIMATIONS = { sitting: sittingStages };
+// name. The two sittings are the same seven stages told twice: each room has
+// its own presiding officer and its own answer to who a vote speaks for, and
+// each is a different size, so neither the captions nor the camera carry over.
+const ANIMATIONS = { sitting: sittingStages, "house-sitting": houseSittingStages };
 
 // A room is entered from a building, so it is always left back into one. Without
 // this the only way out of the chamber is to pick some other institution off the
@@ -207,9 +210,10 @@ export default function ChamberView({ id }) {
           <p className="stage-note">
             {chamber.seatsInstalled} seats were installed in this room ({chamber.source}); the model
             holds {seats} &mdash; {floorSeats} on the floor and {gallerySeats} in
-            the gallery. That agreement is the only check there is: every dimension of the room is
-            derived, not sourced, because no floor plan of it is public. Ceiling {height} m, wall
-            radius {radius} m.
+            the gallery. That agreement is the only check on the room's size. The seats and desks
+            are spaced to their manufacturer's drawings; the room round them is sized to hold
+            them, not measured, because no floor plan of it is public. Ceiling {height} m, nearest
+            wall {radius} m from the chair.
           </p>
         </>
       )}

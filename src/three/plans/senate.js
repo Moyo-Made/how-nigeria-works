@@ -24,7 +24,7 @@ import { createPlan } from "../chamberPlan.js";
 // the centre line, where the balcony stops — says so where it is set.
 export default createPlan({
   // Which wall stands behind the chair. The two rooms' are different designs —
-  // see the elevations in Chamber.jsx.
+  // see ChamberElevation.jsx.
   elevation: "senate",
 
   // How far round the seating runs. From the gallery the bank is plainly less

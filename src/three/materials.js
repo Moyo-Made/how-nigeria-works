@@ -25,7 +25,9 @@ export const OAK = { color: "#b5834a", roughness: 0.62, metalness: 0.04 };
 export const OAK_SHADE = { color: "#846649", roughness: 0.68, metalness: 0.04 };
 // The fluted acoustic panels either side of the dais read paler and cooler than
 // the bench oak; they are a different timber, not the same one in shadow.
-export const OAK_PALE = { color: "#bfa079", roughness: 0.72, metalness: 0.02 };
+// Dead matt, and not for realism's sake: any sheen on a wall of battens seen
+// edge-on from beside it sums the whole ceiling's lamps into a white glare.
+export const OAK_PALE = { color: "#bfa079", roughness: 0.95, metalness: 0 };
 export const BAIZE_RED = { color: "#b3202b", roughness: 0.94, metalness: 0 };
 export const CARPET_RED = { color: "#8e1c26", roughness: 0.98, metalness: 0 };
 // The risers between tiers, a shade down from the treads. The real ones are the

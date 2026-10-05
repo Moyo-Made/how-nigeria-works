@@ -23,7 +23,6 @@ import { useChamber } from "./chamberContext.js";
 //           first two are on the wall behind the chair, outboard of the door;
 //           the third is on the side wall.
 //           https://www.lindaikejisblog.com/photos/shares/eedsd_1714480944.PNG
-//           https://www.edition-bcn.com/wp-content/uploads/2024/04/Nigerian-senate-new-chamber-1068x534-1.jpg
 //   House   two a side, both on the side wall. The one nearer the balcony
 //           stands in the foot of a tower like the one behind the Speaker — two
 //           cherry piers to the ceiling with the coat of arms between them above

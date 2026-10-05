@@ -13,7 +13,8 @@ import { createPlan } from "../chamberPlan.js";
 // fittings — chairs, curved oak desks, the dais furniture piece for piece,
 // fluted acoustic timber, backlit printed panels — in a room that is not the
 // same room. The wall behind the chair is a different composition (see
-// Chamber.jsx), and the House's side walls carry things the Senate's do not.
+// ChamberElevation.jsx), and the House's side walls carry things the Senate's
+// do not.
 // So the plan below borrows the Senate's form only where the photographs agree
 // with it: a tiered fan concentric on the chair, a centre gangway, a panelled
 // elevation behind the dais, a gallery. Everything about its size is derived.
@@ -40,8 +41,8 @@ import { createPlan } from "../chamberPlan.js";
 //
 // UNVERIFIED, all of it, exactly as next door.
 export default createPlan({
-  // Which wall stands behind the chair. Not the Senate's — see the elevations
-  // in Chamber.jsx.
+  // Which wall stands behind the chair. Not the Senate's — see
+  // ChamberElevation.jsx.
   elevation: "house",
 
   // Wider than the Senate's 120: the press photographs from this room's

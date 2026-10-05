@@ -16,7 +16,7 @@
   {
     "id": "first-reading",
     "title": "First Reading",
-    "caption": "The Clerk reads the bill's title to the chamber. Nothing is debated and nothing is voted on — this stage exists only to put the bill formally before the House.",
+    "caption": "The Clerk reads the bill's title to the chamber. Nothing is debated and nothing is voted on — this stage exists only to put the bill formally before the Senate.",
     "highlight": "dais",
     "target": [
       0,
@@ -67,7 +67,7 @@
   {
     "id": "third-reading",
     "title": "Third Reading, and the vote",
-    "caption": "The final vote. Every place on the floor is a state's voice, and every state has three of them regardless of its size — which is the whole point of a Senate.",
+    "caption": "The final vote. There are 109 senators: three from every state regardless of its size, and one from the Federal Capital Territory. Equal voices for unequal states is the whole point of a Senate.",
     "highlight": "division",
     "target": [
       0,
