@@ -14,6 +14,8 @@ import SittingPlayer from "./SittingPlayer.jsx";
 import sittingStages from "../data/chamberSitting.json";
 import houseSittingStages from "../data/chamberSittingHouse.json";
 import appealStages from "../data/courtSitting.json";
+import councilStages from "../data/councilMeeting.json";
+import assentStages from "../data/assent.json";
 
 // Same shape as the specimen's animation table: the field is on the data, so a
 // second chamber can carry a different sequence without this file learning its
@@ -27,6 +29,8 @@ const ANIMATIONS = {
   sitting: sittingStages,
   "house-sitting": houseSittingStages,
   appeal: appealStages,
+  council: councilStages,
+  assent: assentStages,
 };
 
 // A room is entered from a building, so it is always left back into one. Without

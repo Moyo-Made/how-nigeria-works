@@ -61,7 +61,10 @@ function Fluting({ x, z, width, height, y = 0, pitch = 0.17 }) {
 //
 // The masters are in tools/emblems/, drawn for this project so no third-party
 // licence rides along with them. `npm run emblems` renders them.
-export function Emblem({ name, size }) {
+//
+// `tint` is for an emblem cast in metal rather than painted: the colour is
+// multiplied through the artwork, which leaves its drawing and loses its paint.
+export function Emblem({ name, size, tint }) {
   const [texture, setTexture] = useState(null);
 
   // Loaded imperatively rather than through a suspending hook. Suspense would
@@ -96,7 +99,7 @@ export function Emblem({ name, size }) {
       {/* alphaTest rather than plain transparency: the emblem sits against a
           wall it must not sort behind, and a cutout has no ordering to get
           wrong. */}
-      <meshStandardMaterial map={texture} transparent alphaTest={0.35} roughness={0.58} metalness={0.04} />
+      <meshStandardMaterial map={texture} color={tint ?? "#ffffff"} transparent alphaTest={0.35} roughness={0.58} metalness={0.04} />
     </mesh>
   );
 }

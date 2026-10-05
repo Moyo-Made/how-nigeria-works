@@ -36,5 +36,29 @@
     "cta": "Hear an appeal",
     "provenance": "Drawn from the court's own footage of this room in 2023 and 2025 and from press photographs of it. The arrangement is as photographed: the three bays of drape, the coat of arms, a bench of fifteen chairs, the bar in rows and a gallery round three sides. The sizes are not. No plan or dimension of this room is public and, unlike the chambers of the National Assembly, there is no seat count to check against, so every length is estimated from the people in the photographs. The figures are schematic: five Justices are seated because five is the smallest panel that may hear an appeal, and their robes are not drawn in detail.",
     "animation": "appeal"
+  },
+  {
+    "id": "council-chamber",
+    "name": "The Council Chamber",
+    "institution": "aso-rock-villa",
+    "status": "complete",
+    "summary": "The ring of table and the room round it",
+    "source": "State House photographs of Federal Executive Council meetings, 2016–2025",
+    "note": "Where the President meets the Vice-President and the ministers. The room is the same in photographs from 2016 to 2025 except for the wall behind the President's chair, which has carried a white backdrop with the Seal of the President since August 2023.",
+    "cta": "Sit in on the Council",
+    "provenance": "Drawn from the State House's own photographs of meetings in this room between 2016 and February 2025. The arrangement is as photographed: one oval ring of table with a stone wedge let into its face at intervals, the carpet of stars, the lit oval in the ceiling, the columns, and the white backdrop and flags behind the President's chair. The sizes are not: no plan of the room is public, so every length is estimated from the people in the photographs. The paintings on the walls are shown as empty frames, the floor outside the ring is a guess, and the figures stand for members without showing who sits where or how many there are.",
+    "animation": "council"
+  },
+  {
+    "id": "presidents-office",
+    "name": "The signing room",
+    "institution": "aso-rock-villa",
+    "status": "complete",
+    "summary": "The desk, the chair and the wall behind it",
+    "source": "Photographs of bill signings at the State House, June 2023 and February 2026",
+    "note": "The room at the State House where bills have been photographed being signed, under a bronze coat of arms. It is not the President's own desk, and other bills have been signed in a different room; no source found gives any of them a name.",
+    "cta": "Watch a bill being signed",
+    "provenance": "Drawn from photographs of bills being signed in this room in June 2023 and February 2026. Only one side of it has ever been photographed, so the timber wall, the bronze coat of arms, the four flags, the chair and the angled desk are as pictured, and the other three walls, the size of the room and whatever is behind the camera are not known: they are drawn plain, and the view is kept turned toward the part that is. Other bills, the 2024 budget among them, were signed in a different room, and this is not the President's own desk. The figures stand for people without showing who they are.",
+    "animation": "assent"
   }
 ]

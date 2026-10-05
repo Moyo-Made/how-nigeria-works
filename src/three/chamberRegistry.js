@@ -1,9 +1,11 @@
 import { lazy } from "react";
 
-import { COURT, GREEN_CHAMBER, RED_CHAMBER } from "./materials.js";
+import { COUNCIL, COURT, GREEN_CHAMBER, RED_CHAMBER, SIGNING } from "./materials.js";
+import council from "./plans/council.js";
 import courtroom from "./plans/courtroom.js";
 import house from "./plans/house.js";
 import senate from "./plans/senate.js";
+import signing from "./plans/signing.js";
 
 // One entry per modelled interior: the plan that shapes the room, the palette
 // that colours it, and the facts about it a camera needs in order to stand
@@ -24,6 +26,10 @@ const Chamber = lazy(loadChamber);
 const loadCourtroom = () => import("./Courtroom.jsx");
 const Courtroom = lazy(loadCourtroom);
 const CourtRig = lazy(() => import("./CourtRig.jsx"));
+
+const loadCouncil = () => import("./CouncilChamber.jsx");
+const CouncilChamber = lazy(loadCouncil);
+const CouncilRig = lazy(() => import("./CouncilRig.jsx"));
 
 // Three-quarter from the floor of the House. Dead-on holds the dais elevation
 // nicely but flattens the rake to a set of faint rings, because looking straight
@@ -101,10 +107,67 @@ function court(plan, palette, look, ground) {
   };
 }
 
+// The Council Chamber is the one room here an eye can walk all the way round:
+// it is a ring with a wall on every side and nothing behind any of them worth
+// hiding, so the sweep is unlimited. The reach keeps the eye inside the columns
+// and the polar limits keep it under the soffit and over the members' heads.
+function ring(plan, palette, look, ground) {
+  const reach = 7;
+
+  return {
+    plan,
+    palette,
+    Component: CouncilChamber,
+    Rig: CouncilRig,
+    load: loadCouncil,
+    eye: [0.3, 0.3, 0.9].map((c, i) => look[i] + c * reach * 0.98),
+    look,
+    fov: 58,
+    reach,
+    minReach: 2.5,
+    halfSweep: Infinity,
+    minPolar: Math.acos(Math.min(1, (plan.WALL_H - 0.4 - look[1]) / reach)),
+    maxPolar: 1.45,
+    ground,
+  };
+}
+
+const loadSigning = () => import("./SigningRoom.jsx");
+const SigningRoom = lazy(loadSigning);
+const SigningRig = lazy(() => import("./SigningRig.jsx"));
+
+// Only one wall of the signing room has ever been photographed, so the fence
+// here is as much about honesty as about walls: the eye may swing far enough to
+// see the desk from either end and no further, which keeps the three walls
+// nobody has a picture of at the edge of the frame instead of the middle of it.
+function study(plan, palette, look, ground) {
+  const reach = plan.FRONT_Z - 0.8 - look[2];
+
+  return {
+    plan,
+    palette,
+    Component: SigningRoom,
+    Rig: SigningRig,
+    load: loadSigning,
+    eye: [0.3, 0.2, 0.93].map((c, i) => look[i] + c * reach * 0.98),
+    look,
+    fov: 58,
+    reach,
+    // Nearer than this and the eye is over the desk.
+    minReach: 2.6,
+    halfSweep: 0.85,
+    minPolar: Math.acos(Math.min(1, (plan.WALL_H - 0.3 - look[1]) / reach)),
+    maxPolar: 1.5,
+    ground,
+  };
+}
+
 const INTERIORS = {
   senate: interior(senate, RED_CHAMBER, [0, 1.5, 2.8], "#150b09"),
   house: interior(house, GREEN_CHAMBER, [0, 1.7, 3.9], "#0a1512"),
   courtroom: court(courtroom, COURT, [0, 1.9, 0.5], "#140d0a"),
+  "council-chamber": ring(council, COUNCIL, [0, 1.2, 0], "#120a08"),
+  "presidents-office": study(signing, SIGNING, [0, 1.3, -1.6], "#120a08"),
 };
 
 export function getInterior(id) {

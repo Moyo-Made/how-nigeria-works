@@ -1,8 +1,10 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
 
 import { Emblem } from "./ChamberElevation.jsx";
 import { useChamber } from "./chamberContext.js";
+import { LIT, spaced } from "./roomKit.js";
+import { SeatPart } from "./roomParts.jsx";
 
 // The Main Courtroom of the Supreme Court. What it is drawn from, which room it
 // is and is not, and why every length in it is derived rather than measured are
@@ -66,47 +68,7 @@ function ArcSlab({ centre, flip = false, inner, outer, y0 = 0, y1, from, to, mat
   );
 }
 
-// One part of a chair, drawn once for every seat that has it. A seat says where
-// it is and which way it faces; the part says where it sits in the chair's own
-// frame — up, and forward toward whatever the sitter is looking at.
-function SeatPart({ seats, dy, dz = 0, dx = 0, children }) {
-  const ref = useRef();
-
-  useLayoutEffect(() => {
-    const matrix = new THREE.Matrix4();
-    const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3(1, 1, 1);
-    const up = new THREE.Vector3(0, 1, 0);
-
-    seats.forEach(({ x, y, z, yaw }, i) => {
-      const sin = Math.sin(yaw);
-      const cos = Math.cos(yaw);
-      quaternion.setFromAxisAngle(up, yaw);
-      matrix.compose(
-        new THREE.Vector3(x + sin * dz + cos * dx, y + dy, z + cos * dz - sin * dx),
-        quaternion,
-        scale
-      );
-      ref.current.setMatrixAt(i, matrix);
-    });
-    ref.current.instanceMatrix.needsUpdate = true;
-  }, [seats, dx, dy, dz]);
-
-  return (
-    <instancedMesh ref={ref} args={[null, null, seats.length]} castShadow receiveShadow>
-      {children}
-    </instancedMesh>
-  );
-}
-
 // ---- The shell --------------------------------------------------------------
-
-const LIT = { color: "#f6f8fb", emissive: "#ffffff", emissiveIntensity: 0.9, roughness: 0.9 };
-
-const spaced = (from, to, pitch) => {
-  const count = Math.max(1, Math.round((to - from) / pitch));
-  return Array.from({ length: count }, (_, i) => from + ((i + 0.5) * (to - from)) / count);
-};
 
 // A plain hall lined in golden timber, the lining cut into upright panels by
 // dark recesses, under a white ceiling of lit panels. The recesses and the lit

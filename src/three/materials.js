@@ -166,3 +166,74 @@ export const COURT = {
   skin: { color: "#6b4a38", roughness: 0.8, metalness: 0 },
   bands: { color: "#f1efe8", roughness: 0.9, metalness: 0 },
 };
+
+// ---- The Council Chamber at the State House ---------------------------------
+// Read off the State House's own photographs of the room (see plans/council.js)
+// and pulled back harder than anything else here: they are processed until the
+// timber is scarlet and the carpet turquoise. What survives the correction is a
+// dark, glossy red timber on every wall and on the table, a blue-green carpet
+// and upholstery, teal curtains, and a pale pink figured stone set into the
+// table's face and the columns.
+export const COUNCIL = {
+  timber: { color: "#7a3424", roughness: 0.38, metalness: 0.05 },
+  timberDark: { color: "#4b2118", roughness: 0.5, metalness: 0.04 },
+  timberTop: { color: "#8a3c28", roughness: 0.3, metalness: 0.05 },
+  stone: { color: "#d8b5a6", roughness: 0.55, metalness: 0 },
+  stoneLit: { color: "#f3ddd2", emissive: "#ffe9de", emissiveIntensity: 0.55, roughness: 0.8 },
+  plinth: { color: "#1f3a36", roughness: 0.8, metalness: 0 },
+  carpet: { color: "#2c6a5d", roughness: 0.98, metalness: 0 },
+  // Outside the ring no frame shows the floor. It is drawn as the same carpet a
+  // shade down, and that is a guess.
+  carpetOuter: { color: "#24554b", roughness: 0.98, metalness: 0 },
+  star: { color: "#e6eae3", roughness: 0.95, metalness: 0 },
+  leather: { color: "#2d4b45", roughness: 0.5, metalness: 0.03 },
+  curtain: { color: "#2f7880", roughness: 0.98, metalness: 0 },
+  curtainFold: { color: "#3b8a92", roughness: 0.98, metalness: 0 },
+  backdrop: { color: "#ecebf0", roughness: 0.9, metalness: 0 },
+  sealInk: { color: "#1d2a5a", roughness: 0.8, metalness: 0 },
+  oval: { color: "#eef4e6", emissive: "#e6f2dc", emissiveIntensity: 0.6, roughness: 0.9 },
+  spark: { color: "#ffffff", emissive: "#ffffff", emissiveIntensity: 1.6, roughness: 0.9 },
+  rim: { color: "#a9793a", roughness: 0.4, metalness: 0.2 },
+  frame: { color: "#9a7b3c", roughness: 0.5, metalness: 0.15 },
+  canvas: { color: "#8b7150", roughness: 0.95, metalness: 0 },
+  rope: { color: "#a3202a", roughness: 0.8, metalness: 0 },
+  pot: { color: "#eeeae2", roughness: 0.6, metalness: 0 },
+  leaf: { color: "#3f7a45", roughness: 0.9, metalness: 0 },
+  brass: BRASS,
+  charcoal: CHARCOAL,
+  flagGreen: FLAG_GREEN,
+  flagWhite: FLAG_WHITE,
+  flagRed: FLAG_RED,
+  flagBlue: { color: "#2b4f9e", roughness: 0.85, metalness: 0 },
+  // The figures are schematic — see People in CouncilChamber.jsx.
+  cloth: [
+    { color: "#e7e4dc", roughness: 0.9, metalness: 0 },
+    { color: "#8fb4cf", roughness: 0.9, metalness: 0 },
+    { color: "#2a3040", roughness: 0.85, metalness: 0 },
+  ],
+  skin: { color: "#6b4a38", roughness: 0.8, metalness: 0 },
+};
+
+// ---- The signing room at the State House -----------------------------------
+// The same dark glossy timber as the Council Chamber, in the same building and
+// photographed by the same office, so it takes that room's values. What is its
+// own: brass let into the wall and the desk front in fine lines, a dark inset
+// in the desk top, a grey chair and a grey carpet (the 2023 and 2026 frames
+// listed in plans/signing.js).
+export const SIGNING = {
+  timber: COUNCIL.timber,
+  timberDark: COUNCIL.timberDark,
+  timberTop: COUNCIL.timberTop,
+  inset: { color: "#1c2433", roughness: 0.6, metalness: 0.02 },
+  carpet: { color: "#7b7f84", roughness: 0.98, metalness: 0 },
+  leather: { color: "#6d7074", roughness: 0.5, metalness: 0.03 },
+  paper: { color: "#f2f0ea", roughness: 0.9, metalness: 0 },
+  bronze: "#b9924e",
+  brass: BRASS,
+  flagGreen: FLAG_GREEN,
+  flagWhite: FLAG_WHITE,
+  flagRed: FLAG_RED,
+  flagBlue: COUNCIL.flagBlue,
+  cloth: COUNCIL.cloth,
+  skin: COUNCIL.skin,
+};

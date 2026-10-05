@@ -157,6 +157,7 @@
     "hotspots": [
       {
         "id": "presidents-office",
+        "interior": "presidents-office",
         "label": "The President's Office",
         "short": "President's Office",
         "blurb": "Where the President works, and where a bill arrives from the National Assembly to be assented to — or not.",
@@ -168,6 +169,7 @@
       },
       {
         "id": "council-chamber",
+        "interior": "council-chamber",
         "label": "Council Chamber",
         "blurb": "Where the Federal Executive Council — the President, Vice President and ministers — meets to take decisions together.",
         "position": [

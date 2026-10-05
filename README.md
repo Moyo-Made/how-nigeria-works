@@ -50,8 +50,10 @@ the outputs are committed, so you only run them when the card or the mark change
 | --- | --- |
 | `src/data/institutions.json` | Every institution: facts, sources, hotspots, prose |
 | `src/data/billToLaw.json` | The ten stages of the bill-to-law animation |
-| `src/data/chambers.json` | The rooms you can step into: the two chambers and the Supreme Court's Main Courtroom |
+| `src/data/chambers.json` | The rooms you can step into: the two chambers, the Supreme Court's Main Courtroom, the Council Chamber and the signing room |
 | `src/data/courtSitting.json` | The seven stages of an appeal being heard in the courtroom |
+| `src/data/councilMeeting.json` | The six stages of a meeting of the Federal Executive Council |
+| `src/data/assent.json` | The five stages of a bill being signed, or not |
 | `src/components/` | The shell — rail, stage controls, panel, bill player |
 | `src/three/` | Scene rig, plinth, per-institution models, animation |
 | `src/three/registry.js` | Maps an institution to its model chunk |
@@ -114,8 +116,8 @@ card, player and track, hotspot card, and three added with the system —
 - **Quick check** (`QuickCheck.jsx`) — one question, answered once, with the same
   explanation whether the pick was right or wrong.
 
-**Checks in a sitting.** A stage in `chamberSitting.json`, `chamberSittingHouse.json` or
-`courtSitting.json` may
+**Checks in a sitting.** A stage in `chamberSitting.json`, `chamberSittingHouse.json`,
+`courtSitting.json`, `councilMeeting.json` or `assent.json` may
 carry `check: { question, options, answer, explain, source }`. The sequence stops on that
 stage to ask it; it can be skipped but not missed. A check is only written where the
 Constitution gives the answer, and `source` is the section — the accuracy rules above
