@@ -127,3 +127,42 @@ export const GREEN_CHAMBER = {
   leather: LEATHER_GREEN,
   panel: PANEL_GREEN,
 };
+
+// ---- The Main Courtroom of the Supreme Court -------------------------------
+// Read off the Vanguard and TheNigeriaLawyer frames of the room and the court's
+// own 2025 footage (see plans/courtroom.js), then pulled back for the reason
+// the chambers' colours were: press frames of this room are pushed far enough
+// that the wall timber reads as orange and the drapes as black.
+//
+// Two timbers, and telling them apart is most of what makes the room read: a
+// golden one lining the walls, and a dark red one that every desk, the bench
+// and the gallery fronts are made of.
+export const COURT = {
+  timber: { color: "#b28a4c", roughness: 0.9, metalness: 0 },
+  mahogany: { color: "#6b3a2a", roughness: 0.55, metalness: 0.04 },
+  // The piers and frames round the drapes: redder than the wall lining they
+  // stand on, lighter than the desks.
+  pier: { color: "#96602f", roughness: 0.6, metalness: 0.04 },
+  mahoganyDark: { color: "#3d231b", roughness: 0.7, metalness: 0.03 },
+  // The padded panels set into the front of the bench and the officers' desk.
+  panel: { color: "#7b5a4d", roughness: 0.8, metalness: 0 },
+  // The recesses that cut the wall lining into upright panels.
+  slot: { color: "#2e2019", roughness: 0.95, metalness: 0 },
+  drape: { color: "#151d3a", roughness: 0.98, metalness: 0 },
+  drapeFold: { color: "#1c2748", roughness: 0.98, metalness: 0 },
+  disc: { color: "#d9d6cc", roughness: 0.8, metalness: 0 },
+  // The Justices' chairs are grey leather in a timber frame with a carved crest.
+  leather: { color: "#6c7076", roughness: 0.5, metalness: 0.03 },
+  seatTan: { color: "#c19a59", roughness: 0.9, metalness: 0 },
+  seatDark: { color: "#252c40", roughness: 0.6, metalness: 0.03 },
+  carpet: { color: "#6a2b2b", roughness: 0.98, metalness: 0 },
+  carpetShade: { color: "#572222", roughness: 0.98, metalness: 0 },
+  plaster: PLASTER,
+  brass: BRASS,
+  charcoal: CHARCOAL,
+  // The figures are schematic — see Figure in Courtroom.jsx.
+  robe: { color: "#17171a", roughness: 0.85, metalness: 0 },
+  wig: { color: "#e2dccb", roughness: 0.95, metalness: 0 },
+  skin: { color: "#6b4a38", roughness: 0.8, metalness: 0 },
+  bands: { color: "#f1efe8", roughness: 0.9, metalness: 0 },
+};

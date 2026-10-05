@@ -24,5 +24,17 @@
     "source": "Figueras, 2024",
     "note": "Twice the Senate's room: the same refit put 644 seats and about 2,000 m² of carpet in here against 312 and about 1,000 next door. It is modelled from its own plan rather than as a recolour of the Red Chamber, and its size is worked out from the seats it has to hold, not measured — no floor plan of either chamber is public.",
     "animation": "house-sitting"
+  },
+  {
+    "id": "courtroom",
+    "name": "The Main Courtroom",
+    "institution": "supreme-court",
+    "status": "complete",
+    "summary": "Bench, bar and galleries",
+    "source": "Supreme Court of Nigeria media office footage, 2023 and 2025; press photographs, 2020",
+    "note": "The Supreme Court building has more than one courtroom. This is the large one, with the dark blue drapes and the long curved bench. A smaller, pale-timber courtroom refitted in October 2023 appears in many recent news photographs and is a different room.",
+    "cta": "Hear an appeal",
+    "provenance": "Drawn from the court's own footage of this room in 2023 and 2025 and from press photographs of it. The arrangement is as photographed: the three bays of drape, the coat of arms, a bench of fifteen chairs, the bar in rows and a gallery round three sides. The sizes are not. No plan or dimension of this room is public and, unlike the chambers of the National Assembly, there is no seat count to check against, so every length is estimated from the people in the photographs. The figures are schematic: five Justices are seated because five is the smallest panel that may hear an appeal, and their robes are not drawn in detail.",
+    "animation": "appeal"
   }
 ]

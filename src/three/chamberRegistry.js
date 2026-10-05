@@ -1,6 +1,7 @@
 import { lazy } from "react";
 
-import { GREEN_CHAMBER, RED_CHAMBER } from "./materials.js";
+import { COURT, GREEN_CHAMBER, RED_CHAMBER } from "./materials.js";
+import courtroom from "./plans/courtroom.js";
 import house from "./plans/house.js";
 import senate from "./plans/senate.js";
 
@@ -15,7 +16,14 @@ import senate from "./plans/senate.js";
 
 // lazy() must return the same component identity across renders, same as the
 // specimen registry. Both rooms are that one component, so one wrapper serves.
-const Chamber = lazy(() => import("./Chamber.jsx"));
+const loadChamber = () => import("./Chamber.jsx");
+const Chamber = lazy(loadChamber);
+
+// The courtroom is its own room and its own chunk: stepping into the Senate
+// should not download the Supreme Court.
+const loadCourtroom = () => import("./Courtroom.jsx");
+const Courtroom = lazy(loadCourtroom);
+const CourtRig = lazy(() => import("./CourtRig.jsx"));
 
 // Three-quarter from the floor of the House. Dead-on holds the dais elevation
 // nicely but flattens the rake to a set of faint rings, because looking straight
@@ -36,6 +44,7 @@ function interior(plan, palette, look, ground) {
     plan,
     palette,
     Component: Chamber,
+    load: loadChamber,
     eye: BEARING.map((c, i) => look[i] + c * reach * 0.98),
     look,
     fov: 58,
@@ -62,13 +71,44 @@ function interior(plan, palette, look, ground) {
 // The look-at point sits out in the seating rather than at the room's centre,
 // and scales with the room: a chamber half again as wide is looked at from
 // proportionally further into it.
+// The courtroom is a rectangular hall, not a fan, so none of the chambers'
+// fence applies and its own is written down here. Each limit is the room's:
+// the reach stops the eye short of the rear gallery, the sweep keeps it between
+// the two side galleries, and the two polar limits keep it under the ceiling
+// and above the back row's desks. They are worked from the plan, so moving a
+// wall moves the fence.
+function court(plan, palette, look, ground) {
+  const reach = plan.GALLERY_REAR_Z - 1.5 - look[2];
+  const maxPolar = 1.5;
+  const sweepAt = plan.HALF_W - plan.GALLERY_DEPTH - 0.6;
+
+  return {
+    plan,
+    palette,
+    Component: Courtroom,
+    Rig: CourtRig,
+    load: loadCourtroom,
+    eye: [0.34, 0.26, 0.9].map((c, i) => look[i] + c * reach * 0.98),
+    look,
+    fov: 58,
+    reach,
+    // Nearer than this and the eye is standing in the lectern.
+    minReach: 3.5,
+    halfSweep: Math.asin(Math.min(1, sweepAt / reach)),
+    minPolar: Math.acos(Math.min(1, (plan.WALL_H - 0.5 - look[1]) / reach)),
+    maxPolar,
+    ground,
+  };
+}
+
 const INTERIORS = {
   senate: interior(senate, RED_CHAMBER, [0, 1.5, 2.8], "#150b09"),
   house: interior(house, GREEN_CHAMBER, [0, 1.7, 3.9], "#0a1512"),
+  courtroom: court(courtroom, COURT, [0, 1.9, 0.5], "#140d0a"),
 };
 
 export function getInterior(id) {
   return INTERIORS[id] ?? null;
 }
 
-export const preloadInterior = (id) => (INTERIORS[id] ? import("./Chamber.jsx") : undefined);
+export const preloadInterior = (id) => INTERIORS[id]?.load();

@@ -88,9 +88,15 @@ export default function App() {
           <Rail currentId={institution.id} />
 
           {inChamber ? (
-            <Suspense fallback={<StagePlaceholder label="Preparing the chamber…" />}>
-              <ChamberView id={id} />
-            </Suspense>
+            <>
+              <Suspense fallback={<StagePlaceholder label="Preparing the chamber…" />}>
+                <ChamberView id={id} />
+              </Suspense>
+              {/* Stepping into a room does not leave the building, so what the
+                  panel says about the building stays beside it. Outside the
+                  Suspense: it is plain text and should not wait for the room. */}
+              <ContentPanel institution={institution} />
+            </>
           ) : built ? (
             <Suspense fallback={<StagePlaceholder label="Preparing the model…" />}>
               <SpecimenView

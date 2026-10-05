@@ -1,0 +1,110 @@
+[
+  {
+    "id": "sits",
+    "title": "The court sits",
+    "caption": "Fifteen chairs, five Justices. The Supreme Court never hears an appeal as a whole court: the Constitution says it is properly made up when at least five of its Justices sit, and the rest of the bench stands empty.",
+    "source": "s. 234",
+    "highlight": "bench",
+    "target": [0, 2.3, -5.2],
+    "azimuth": 0.24,
+    "polar": 1.36,
+    "distance": 9.5,
+    "check": {
+      "question": "This appeal turns on what a section of the Constitution means. How many Justices must hear it?",
+      "options": ["Five, as for any appeal", "Seven", "Every Justice of the court"],
+      "answer": 1,
+      "explain": "Five is the minimum for the court to be properly constituted. Where an appeal is about the interpretation of the Constitution or a breach of fundamental rights, or the court is using its original jurisdiction, the panel is seven.",
+      "source": "s. 234"
+    }
+  },
+  {
+    "id": "public",
+    "title": "In public",
+    "caption": "The galleries round three sides of the room are there to be sat in. The Constitution requires the proceedings of a court, and the announcement of its decision, to be held in public — justice is meant to be watched being done.",
+    "source": "s. 36(3)",
+    "highlight": "gallery",
+    "target": [-9, 3.9, 6],
+    "azimuth": 1.05,
+    "polar": 1.42,
+    "distance": 11
+  },
+  {
+    "id": "called",
+    "title": "The appeal is called",
+    "caption": "The court's officers, at the desk below the bench, call the case. It has already been through at least one court before this one: an appeal reaches the Supreme Court from the Court of Appeal, and from nowhere else.",
+    "source": "s. 233(1)",
+    "highlight": "officers",
+    "target": [0, 1.5, -3.2],
+    "azimuth": -0.32,
+    "polar": 1.25,
+    "distance": 6.5,
+    "check": {
+      "question": "Which court do appeals to the Supreme Court come from?",
+      "options": ["Any court in Nigeria", "The Court of Appeal", "The Federal High Court"],
+      "answer": 1,
+      "explain": "The Supreme Court alone hears appeals from the Court of Appeal. A case that starts in a High Court has to go through the Court of Appeal first.",
+      "source": "s. 233(1)"
+    }
+  },
+  {
+    "id": "argued",
+    "title": "Counsel are heard",
+    "caption": "A lawyer for each side addresses the bench in turn. Look for a witness box and there is none: this is an appeal, so the argument is over what the law means and whether the court below applied it properly, not over what happened.",
+    "highlight": "lectern",
+    "target": [0, 1.5, 0.5],
+    "azimuth": 2.5,
+    "polar": 1.3,
+    "distance": 4.4
+  },
+  {
+    "id": "rises",
+    "title": "The court rises",
+    "caption": "The Justices leave to decide. That part happens out of this room and out of sight, but not without a limit: every court must deliver its decision in writing within ninety days of the final addresses.",
+    "source": "s. 294(1)",
+    "highlight": "empty",
+    "target": [0, 2.6, -3],
+    "azimuth": 0,
+    "polar": 1.3,
+    "distance": 13
+  },
+  {
+    "id": "judgment",
+    "title": "Judgment",
+    "caption": "The court returns. Each Justice gives an opinion in writing, or says in writing that they adopt the opinion of another who has — so a Justice who disagrees can say so, and say why.",
+    "source": "s. 294(2)",
+    "highlight": "bench",
+    "target": [0, 2.4, -5.2],
+    "azimuth": -0.2,
+    "polar": 1.38,
+    "distance": 6.8,
+    "check": {
+      "question": "The five Justices split three to two. Whose view is the court's decision?",
+      "options": [
+        "The most senior Justice's",
+        "The three — the majority",
+        "Neither — the appeal is heard again"
+      ],
+      "answer": 1,
+      "explain": "The decision of a court of more than one judge is the opinion of the majority of its members. The two in the minority still give their opinions; they simply do not carry the day.",
+      "source": "s. 294(3)"
+    }
+  },
+  {
+    "id": "final",
+    "title": "The last word",
+    "caption": "There is nowhere to take the case from here. No appeal lies from a decision of the Supreme Court to any other body or person, which is what makes this the room where an argument about the law in Nigeria finally ends.",
+    "source": "s. 235",
+    "highlight": "arms",
+    "target": [0, 4.2, -8.3],
+    "azimuth": 0.12,
+    "polar": 1.5,
+    "distance": 9.5,
+    "check": {
+      "question": "Who can hear an appeal against a decision of the Supreme Court?",
+      "options": ["The President", "The National Assembly", "Nobody"],
+      "answer": 2,
+      "explain": "No appeal lies to any other body or person. The section leaves one thing untouched — the President's and a Governor's power to grant mercy to a convicted person — but that is a pardon, not an appeal.",
+      "source": "s. 235"
+    }
+  }
+]

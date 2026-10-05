@@ -13,13 +13,21 @@ import { useSequence } from "../hooks/useSequence.js";
 import SittingPlayer from "./SittingPlayer.jsx";
 import sittingStages from "../data/chamberSitting.json";
 import houseSittingStages from "../data/chamberSittingHouse.json";
+import appealStages from "../data/courtSitting.json";
 
 // Same shape as the specimen's animation table: the field is on the data, so a
 // second chamber can carry a different sequence without this file learning its
 // name. The two sittings are the same seven stages told twice: each room has
 // its own presiding officer and its own answer to who a vote speaks for, and
 // each is a different size, so neither the captions nor the camera carry over.
-const ANIMATIONS = { sitting: sittingStages, "house-sitting": houseSittingStages };
+//
+// The courtroom's is a different sequence altogether — an appeal being heard —
+// run by the same player and the same camera.
+const ANIMATIONS = {
+  sitting: sittingStages,
+  "house-sitting": houseSittingStages,
+  appeal: appealStages,
+};
 
 // A room is entered from a building, so it is always left back into one. Without
 // this the only way out of the chamber is to pick some other institution off the
@@ -86,6 +94,8 @@ export default function ChamberView({ id }) {
   const { Component, plan, palette, eye, look, fov, reach, minReach, halfSweep, minPolar, maxPolar } =
     interior;
   const { radius, height, floorSeats, gallerySeats, seats, ground } = interior;
+  // A room that is not a chamber of the Assembly brings its own light.
+  const Rig = interior.Rig ?? ChamberRig;
 
   return (
     <div className="stage-col">
@@ -102,9 +112,8 @@ export default function ChamberView({ id }) {
               every piece of geometry below asks context which room it is in
               rather than being told by whoever rendered it. */}
           <ChamberContext.Provider value={{ plan, palette }}>
-            <ChamberRig dim={current?.highlight === "empty"} />
-
             <Suspense fallback={null}>
+              <Rig dim={current?.highlight === "empty"} />
               <Component highlight={current?.highlight ?? null} />
             </Suspense>
 
@@ -160,8 +169,9 @@ export default function ChamberView({ id }) {
           />
         ) : (
           <p className="stage-tip">
-            {chamber.name} &middot; the {chamber.byColour} &middot; {chamber.summary} &middot; drag
-            to look around
+            {chamber.name}
+            {chamber.byColour && <> &middot; the {chamber.byColour}</>} &middot; {chamber.summary}{" "}
+            &middot; drag to look around
           </p>
         )}
       </div>
@@ -178,7 +188,7 @@ export default function ChamberView({ id }) {
                   onClick={seq.start}
                 >
                   <span className="cta-play" aria-hidden="true" />
-                  Watch a sitting
+                  {chamber.cta ?? "Watch a sitting"}
                 </button>
               </>
             )}
@@ -186,13 +196,19 @@ export default function ChamberView({ id }) {
 
           {/* Below the controls rather than beside them: it is the caption on the
               specimen, not a tool, and it is the longest line in the app. */}
+          {/* A room with no published seat count has nothing to check itself
+              against, and says what it is built from instead. */}
           <p className="stage-note">
-            {chamber.seatsInstalled} seats were installed in this room ({chamber.source}); the model
+            {chamber.provenance ?? (
+              <>
+                {chamber.seatsInstalled} seats were installed in this room ({chamber.source}); the model
             holds {seats} &mdash; {floorSeats} on the floor and {gallerySeats} in
             the gallery. That agreement is the only check on the room's size. The seats and desks
             are spaced to their manufacturer's drawings; the room round them is sized to hold
             them, not measured, because no floor plan of it is public. Ceiling {height} m, nearest
             wall {radius} m from the chair.
+              </>
+            )}
           </p>
         </>
       )}

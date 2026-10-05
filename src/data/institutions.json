@@ -263,6 +263,7 @@
     "hotspots": [
       {
         "id": "courtroom",
+        "interior": "courtroom",
         "label": "The courtroom",
         "short": "Courtroom",
         "blurb": "Where the Justices sit as a panel to hear appeals. No witnesses and no new evidence — only argument about what the law means. Each Justice may give their own reasons, and the view of the majority binds every other court.",
