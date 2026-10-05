@@ -7,6 +7,7 @@ const PRIMITIVES = {
   "national-assembly": { load: () => import("./NationalAssembly.jsx"), scale: 0.55 },
   "aso-rock-villa": { load: () => import("./AsoRockVilla.jsx"), scale: 0.46 },
   "supreme-court": { load: () => import("./SupremeCourt.jsx"), scale: 0.52 },
+  inec: { load: () => import("./Inec.jsx"), scale: 0.5 },
 };
 
 const FALLBACK = { load: () => import("./PlaceholderBuilding.jsx"), scale: 1 };

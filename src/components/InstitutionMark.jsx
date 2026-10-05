@@ -53,6 +53,26 @@ function SupremeCourtMark() {
   );
 }
 
+function InecMark() {
+  return (
+    <>
+      <rect className="m-stone" x="62" y="16" width="62" height="54" />
+      {[62, 71, 80, 89, 98, 107, 116, 122].map((x) => (
+        <rect key={x} className="m-shade" x={x} y="14" width="2" height="56" />
+      ))}
+      <rect className="m-shade" x="60" y="12" width="66" height="4" />
+      <rect className="m-shade" x="124" y="14" width="12" height="56" rx="5" />
+      <rect className="m-stone" x="22" y="46" width="56" height="24" />
+      {[22, 31, 40, 49, 58, 67, 76].map((x) => (
+        <rect key={x} className="m-shade" x={x} y="44" width="2" height="26" />
+      ))}
+      <rect className="m-shade" x="20" y="42" width="60" height="4" />
+      <rect className="m-green" x="140" y="52" width="6" height="18" />
+      <rect className="m-shade" x="8" y="70" width="144" height="6" />
+    </>
+  );
+}
+
 function GenericMark() {
   return (
     <>
@@ -70,6 +90,7 @@ const MARKS = {
   "national-assembly": NationalAssemblyMark,
   "aso-rock-villa": AsoRockMark,
   "supreme-court": SupremeCourtMark,
+  inec: InecMark,
 };
 
 export default function InstitutionMark({ id, muted = false }) {

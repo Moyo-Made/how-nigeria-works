@@ -125,5 +125,5 @@ apply to questions exactly as they do to facts.
 
 ## Not in this version
 
-Quiz mode, full Compare, animations beyond bill-to-law, and full content for the State
-House of Assembly, LGA Secretariat and INEC. There is no backend, database or auth.
+Quiz mode, full Compare, and full content for the State House of Assembly and the LGA
+Secretariat. There is no backend, database or auth.

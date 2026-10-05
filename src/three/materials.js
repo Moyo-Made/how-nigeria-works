@@ -237,3 +237,11 @@ export const SIGNING = {
   cloth: COUNCIL.cloth,
   skin: COUNCIL.skin,
 };
+
+// ---- INEC headquarters ------------------------------------------------------
+// Off the street photographs listed in Inec.jsx: a grey concrete frame, cream
+// panels under the windows between its piers, and a red-brown sheet roof over
+// the gate.
+export const CONCRETE = { color: "#9da1a6", roughness: 0.9, metalness: 0.02 };
+export const CONCRETE_SHADE = { color: "#83878c", roughness: 0.9, metalness: 0.02 };
+export const CREAM = { color: "#ddd6c1", roughness: 0.92, metalness: 0.02 };
