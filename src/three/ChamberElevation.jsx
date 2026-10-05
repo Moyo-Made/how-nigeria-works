@@ -372,8 +372,8 @@ function SenateElevation() {
       {/* The cherry band the Senate's side walls carry at the top of the
           fluting (gallery r03), carried across this wall too. */}
       {[-1, 1].map((dir) => (
-        <mesh key={dir} position={[dir * (face + (plan.BACK_WALL_HALF - face) / 2), B + 0.22, 0.12]} receiveShadow>
-          <boxGeometry args={[plan.BACK_WALL_HALF - face, 0.44, 0.24]} />
+        <mesh key={dir} position={[dir * (face + (plan.BACK_WALL_HALF - face) / 2), (B + plan.FASCIA_TOP) / 2, 0.12]} receiveShadow>
+          <boxGeometry args={[plan.BACK_WALL_HALF - face, plan.FASCIA_TOP - B, 0.24]} />
           <meshStandardMaterial {...palette.cherry} />
         </mesh>
       ))}

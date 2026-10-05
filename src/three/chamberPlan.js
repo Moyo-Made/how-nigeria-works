@@ -211,6 +211,14 @@ export function createPlan(p) {
   // fascia (Figueras gallery images r03 and g03). So the band sits wherever the
   // fascia does, and the walls behind the chair are laid out from it: the only
   // proportions the photographs give are ones between things on the same wall.
+  //
+  // The band is deep. Against the fluting under it, on the same wall, it is
+  // between a fifth and a third as tall in every frame that shows both (r05 and
+  // the press photograph of the Senate; g03 and the press photograph of the
+  // House), and the balcony's fascia is the same depth where the two meet. So
+  // GALLERY_SLAB is not a slab: it is the whole depth of the balcony's edge
+  // below its floor, and a plan sets it to make the band about a quarter of
+  // the height of the timber.
   const BAND_Y = p.GALLERY_RISE - p.GALLERY_SLAB;
   // And where the fascia stops: a little above the balcony floor, as an upstand
   // the glass balustrade stands on. The band down the side walls is the same

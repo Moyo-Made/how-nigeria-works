@@ -106,8 +106,10 @@ export default createPlan({
   // Set high deliberately, and not only because a public gallery sits high: the
   // balcony is the innermost thing in the room, so wherever its soffit lands is
   // a ceiling on how far back the eye can stand underneath it.
-  GALLERY_RISE: 6.6,
-  GALLERY_SLAB: 0.4,
+  GALLERY_RISE: 7.4,
+  // The depth of the balcony's edge below its floor, which is the depth of the
+  // band round the room — see BAND_Y in chamberPlan.js. It stood at 0.4.
+  GALLERY_SLAB: 1.2,
   GALLERY_ROWS: 2,
   // The Senate's balcony is a loggia, not an open shelf: the white wall of the
   // room comes down in front of it to a lintel, carried on square white piers

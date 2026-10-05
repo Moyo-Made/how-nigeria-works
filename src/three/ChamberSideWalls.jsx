@@ -138,17 +138,10 @@ function PanelPair({ position, turn, design, framed, tower, y0, y1 }) {
   const pilasterX = PANEL_W + MULLION / 2 + 0.06 + pilaster / 2;
 
   // Backlit: the print is lit from behind, so it carries its own light rather
-  // than waiting for the room's.
-  const material = (
-    <meshStandardMaterial
-      map={texture}
-      emissiveMap={texture}
-      emissive="#ffffff"
-      emissiveIntensity={0.55}
-      roughness={0.6}
-      side={THREE.DoubleSide}
-    />
-  );
+  // than waiting for the room's — and nothing else. The colours were sampled
+  // off the photographs glow and all, so they go to the screen as sampled:
+  // lit by the room as well, and then tone-mapped, a pink panel came out white.
+  const material = <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />;
 
   return (
     <group position={[position[0], 0, position[1]]} rotation={[0, turn, 0]}>

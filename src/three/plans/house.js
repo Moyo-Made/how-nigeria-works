@@ -95,8 +95,9 @@ export default createPlan({
   // Higher than the Senate's, and for the same reason it is high there at all:
   // the balcony soffit is a ceiling on how far back the eye can stand under it,
   // and this room is wide enough that the eye needs to stand a long way back.
-  GALLERY_RISE: 8.0,
-  GALLERY_SLAB: 0.4,
+  GALLERY_RISE: 9.2,
+  // As next door: the depth of the band, not of a slab.
+  GALLERY_SLAB: 1.6,
   GALLERY_ROWS: 3,
   // What the ceiling carries: one large luminous panel over the middle of the
   // room, many-sided, bright enough to burn out in every photograph that looks

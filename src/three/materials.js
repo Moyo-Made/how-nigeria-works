@@ -90,8 +90,10 @@ export const CARPET_GREEN_SHADE = { color: "#145733", roughness: 0.98, metalness
 // The backlit printed panels on the side walls: the same two designs in both
 // rooms, a gavel pair and a pair of linked rectangles, printed red on pink in
 // the Senate and green on a pale green-white in the House. Sampled from gallery
-// images r03 and r09 (Senate) and g06 (House), glow and all.
-const PANEL_RED = { ground: "#f1c8c2", line: "#c3544b" };
+// images r05 and r09 (Senate) and g06 (House), glow and all. The Senate's are
+// a full pink, not a blush: in every frame they are the most saturated thing
+// on the wall.
+const PANEL_RED = { ground: "#f7adc0", line: "#d9506b" };
 const PANEL_GREEN = { ground: "#e2ece7", line: "#3f9e86" };
 
 // What a chamber's geometry actually asks for. Everything picks its colours
