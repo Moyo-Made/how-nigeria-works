@@ -7,7 +7,7 @@
     "target": [
       0,
       0.95,
-      4.84
+      4.76
     ],
     "azimuth": 0.28,
     "polar": 0.8,
@@ -24,8 +24,8 @@
       1.4
     ],
     "azimuth": 0.18,
-    "polar": 1.24,
-    "distance": 5.2
+    "polar": 1.15,
+    "distance": 8.5
   },
   {
     "id": "second-reading",
@@ -44,11 +44,11 @@
     "target": [
       0,
       2.2,
-      4.4
+      5.0
     ],
     "azimuth": 0.42,
     "polar": 1.05,
-    "distance": 5.6
+    "distance": 11.0
   },
   {
     "id": "report",
@@ -58,11 +58,11 @@
     "target": [
       0,
       1.8,
-      3.6
+      4.2
     ],
     "azimuth": -0.3,
     "polar": 1.18,
-    "distance": 5.6
+    "distance": 10.0
   },
   {
     "id": "third-reading",
@@ -72,11 +72,11 @@
     "target": [
       0,
       1.9,
-      4.2
+      5.5
     ],
     "azimuth": 0.2,
-    "polar": 1.1,
-    "distance": 5.8
+    "polar": 1.0,
+    "distance": 14.0
   },
   {
     "id": "transmitted",
@@ -84,12 +84,12 @@
     "caption": "The bill has cleared this chamber. It is still not law: it goes out through those doors to the House of Representatives, which puts it through every one of these stages again — and both chambers must pass the same text.",
     "highlight": "doors",
     "target": [
-      -5.4,
+      -6.1,
       1.5,
       0.4
     ],
-    "azimuth": 0.85,
-    "polar": 1.22,
-    "distance": 5.4
+    "azimuth": -0.75,
+    "polar": 1.3,
+    "distance": 6.5
   }
 ]

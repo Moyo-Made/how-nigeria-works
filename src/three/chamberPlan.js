@@ -22,9 +22,84 @@ export function createPlan(p) {
   const FAN = THREE.MathUtils.degToRad(p.fanDegrees);
   const HALF_FAN = FAN / 2;
 
-  // The dais end is flat — a D-plan, with the curved wall wrapping the seating
-  // and a straight wall carrying the panelled elevation behind the chair.
-  const BACK_WALL_HALF = p.WALL_R;
+  // ---- The walls ------------------------------------------------------------
+  // The room is not round. Press photographs taken from the galleries of both
+  // chambers in session show flat walls meeting at corners: a wide wall behind
+  // the chair, a wall down each side, and two more across the rear that meet on
+  // the centre line, with the balcony over those two.
+  // https://www.lindaikejisblog.com/photos/shares/eedsd_1714480944.PNG (Senate)
+  // https://dailytrust.com/wp-content/uploads/2024/10/house-of-reps.webp (House)
+  //
+  // The seating is still struck from one point on the dais wall, so the walls
+  // are laid out round the circle the seating needs: WALL_R is how far each one
+  // stands from that point at its nearest, and a plan says which way the side
+  // and rear walls face. Everything a circle of that radius holds, the room
+  // holds, which is what lets the camera's fence stay a single number.
+  const SIDE = THREE.MathUtils.degToRad(p.sideDegrees);
+  const REAR = THREE.MathUtils.degToRad(p.rearDegrees);
+
+  // Where two lines meet, each given by the bearing of its normal and its
+  // distance from the origin.
+  const meet = (b1, d1, b2, d2) => {
+    const det = Math.sin(b1 - b2);
+    return [
+      (d1 * Math.cos(b2) - d2 * Math.cos(b1)) / det,
+      (d2 * Math.sin(b1) - d1 * Math.sin(b2)) / det,
+    ];
+  };
+  // A run of wall, or of anything else that stands parallel to one: its ends,
+  // its middle, its length and the bearing it faces away from the chair on.
+  const run = (a, b, bearing) => ({
+    a,
+    b,
+    bearing,
+    mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2],
+    length: Math.hypot(b[0] - a[0], b[1] - a[1]),
+  });
+  // The run parallel to a rear wall at a given distance from the origin, from
+  // the centre line out to the side wall. The rear walls themselves are this at
+  // WALL_R; the balcony's front and each of its rows are this nearer in.
+  const rearRun = (dir, distance) =>
+    run(
+      [0, distance / Math.cos(REAR)],
+      meet(dir * SIDE, p.WALL_R, dir * REAR, distance),
+      dir * REAR
+    );
+
+  const walls = () =>
+    [1, -1].flatMap((dir) => {
+      const rear = rearRun(dir, p.WALL_R);
+      const foot = meet(dir * SIDE, p.WALL_R, 0, p.DAIS_WALL_Z);
+      return [
+        { kind: "side", dir, ...run(foot, rear.b, dir * SIDE) },
+        { kind: "rear", dir, ...rear },
+      ];
+    });
+
+  // A point a fraction of the way along a run, stood off it toward the chair,
+  // and the turn that faces something there into the room.
+  const onRun = ({ a, b, bearing }, u, inset = 0) => ({
+    position: [
+      a[0] + (b[0] - a[0]) * u - Math.sin(bearing) * inset,
+      a[1] + (b[1] - a[1]) * u - Math.cos(bearing) * inset,
+    ],
+    turn: bearing + Math.PI,
+  });
+
+  // How far the wall is from the origin on a bearing, for anything that has to
+  // run out to it.
+  const wallDistance = (bearing) =>
+    Math.min(
+      ...[SIDE, REAR, -REAR, -SIDE]
+        .map((b) => Math.cos(bearing - b))
+        .filter((c) => c > 1e-6)
+        .map((c) => p.WALL_R / c)
+    );
+
+  // The wall behind the chair runs corner to corner.
+  const BACK_WALL_HALF = meet(SIDE, p.WALL_R, 0, p.DAIS_WALL_Z)[0];
+  // The furthest any corner is from the origin, for the floor and the ceiling.
+  const FAR = Math.max(...walls().map(({ b }) => Math.hypot(...b)), BACK_WALL_HALF);
 
   // ---- Gangways -------------------------------------------------------------
   // A chamber where a seat in the middle of a row can only be reached by
@@ -37,14 +112,26 @@ export function createPlan(p) {
   // A gangway is a constant width in metres, so it takes the same arc length
   // out of every row and its angular width narrows as the rows lengthen — one
   // number describes it at every radius.
+  //
+  // Gangways divide the fan evenly, so an odd count puts one on the centre line.
+  // Both rooms need that: the contractor's photographs look straight down a
+  // stepped aisle to the chair in the House and straight up one from the well in
+  // the Senate. See the note on AISLES in ./plans.
   const BLOCKS = p.AISLES + 1;
+  const aisleBearings = Array.from(
+    { length: p.AISLES },
+    (_, i) => -HALF_FAN + ((i + 1) * FAN) / BLOCKS
+  );
+
+  // Half the angle a gangway takes out of an arc at this radius.
+  const aisleHalf = (radius) => p.AISLE_W / 2 / radius;
 
   // Every seating block on a row: where it starts, where it ends, and how many
   // seats fit between. The outer two are held off the stepped returns that
   // close the bank, so the desks and the seat count agree about where the bank
   // physically stops.
   const rowBlocks = (radius) => {
-    const aisle = p.AISLE_W / 2 / radius;
+    const aisle = aisleHalf(radius);
     const inset = p.RETURN_W / 2 / radius;
     const span = FAN / BLOCKS;
 
@@ -76,10 +163,12 @@ export function createPlan(p) {
       };
     });
 
-  // Chairs sit centred between the back of their own desk and the riser of the
-  // row behind, so the gangway closes up or opens out with ROW_PITCH instead of
-  // needing a second number kept in step with it by hand.
-  const chairRadius = (row) => (row.radius + p.BENCH_LIP + row.treadOuter) / 2;
+  // A chair stands drawn up to its desk, not centred in the space behind it:
+  // the manufacturer's drawing has the chair hard against the desk and what is
+  // left of the row behind the chair, as the way past.
+  // https://figueras.com/wp-content/uploads/2023/07/MegaRT_2315_dimensions.jpg
+  const CHAIR_REACH = p.BENCH_LIP + 0.45;
+  const chairRadius = (row) => row.radius + CHAIR_REACH;
 
   // Seats are numbered across the whole row rather than restarting in each
   // block, so a place keeps one identity however the gangways are later moved.
@@ -104,46 +193,82 @@ export function createPlan(p) {
 
   // ---- Galleries ------------------------------------------------------------
   // The room does not stop at the back bench, and the arithmetic is what says
-  // so: a chamber holds far more seats than its floor accounts for, and in a
-  // room this shape a balcony over the rear of the fan is the only place the
-  // rest can be. Its depth is fixed by making the last tread land on the wall,
-  // which is what ties GALLERY_ROWS to GALLERY_PITCH rather than leaving both
-  // free.
+  // so: a chamber holds far more seats than its floor accounts for, and the
+  // balcony is where the rest are.
   //
-  // How far round the balcony can run: the curved wall is only wall where it
-  // stands in front of the dais elevation, and past that point the flat wall has
-  // taken over. Inset slightly so the ends die into panelling rather than into
-  // the junction itself.
-  const GALLERY_FAN = 2 * (Math.acos(p.DAIS_WALL_Z / p.WALL_R) - 0.05);
+  // It stands over the rear of the room only — against the two rear walls, from
+  // one side wall to the other — and its front is two straight runs parallel to
+  // those walls, meeting at an angle on the centre line with a screen hung under
+  // the join (Figueras brochure p. 8 for the Senate; gallery images g03 and g04
+  // and the press photographs above for the House). Its rows are straight too.
+  // Its depth is its rows.
+  const GALLERY_NEAR = p.WALL_R - p.GALLERY_ROWS * p.GALLERY_PITCH;
+  const galleryFront = () => [1, -1].map((dir) => rearRun(dir, GALLERY_NEAR));
 
+  // The line the timber lining stops at. Every photograph of either room shows
+  // the same arrangement: fluted timber up to a cherry band, white plaster above
+  // it, and that band carried round the room at the height of the gallery's
+  // fascia (Figueras gallery images r03 and g03). So the band sits wherever the
+  // fascia does, and the walls behind the chair are laid out from it: the only
+  // proportions the photographs give are ones between things on the same wall.
+  const BAND_Y = p.GALLERY_RISE - p.GALLERY_SLAB;
+  // And where the fascia stops: a little above the balcony floor, as an upstand
+  // the glass balustrade stands on. The band down the side walls is the same
+  // fascia carried on, so it stops at the same height.
+  const FASCIA_TOP = p.GALLERY_RISE + 0.35;
+
+  // The dais climbs in five rises, two to the lower landing and three more to
+  // the top one (Figueras gallery image r10, the only frame that shows its
+  // stairs), so the lower landing stands two fifths of the way up.
+  const DAIS_MID = p.DAIS_LIFT * 0.4;
+
+  // Each row of the balcony: the tread it stands on, as a run either side of
+  // the centre line, and the height of it.
   const galleryRows = () =>
     Array.from({ length: p.GALLERY_ROWS }, (_, index) => {
-      const treadInner = p.GALLERY_FRONT + index * p.GALLERY_PITCH;
-      const radius = treadInner + p.GALLERY_PITCH * 0.5;
+      const near = GALLERY_NEAR + index * p.GALLERY_PITCH;
       return {
         index,
-        treadInner,
-        treadOuter: treadInner + p.GALLERY_PITCH,
-        radius,
+        near,
+        far: near + p.GALLERY_PITCH,
         y: p.GALLERY_RISE + index * p.GALLERY_STEP,
-        seats: Math.floor((GALLERY_FAN * radius) / p.SEAT_PITCH),
+        runs: [1, -1].map((dir) => ({
+          dir,
+          front: rearRun(dir, near),
+          back: rearRun(dir, near + p.GALLERY_PITCH),
+          seats: rearRun(dir, near + p.GALLERY_PITCH * 0.55),
+        })),
       };
     });
 
+  // The balcony's seats are the fixed version of the chair on the floor, with
+  // no desk and no travel, so they stand closer: 58 to 60 cm centre to centre
+  // on the manufacturer's drawing against 95 for the ones that turn.
+  // https://figueras.com/wp-content/uploads/2023/07/Megaseat_9113_dimensions.jpg
   const gallerySeatPositions = () =>
-    galleryRows().flatMap((row) => {
-      const step = GALLERY_FAN / row.seats;
-      return Array.from({ length: row.seats }, (_, seat) => ({
-        row: row.index,
-        seat,
-        angle: -GALLERY_FAN / 2 + (seat + 0.5) * step,
-        radius: row.radius,
-        y: row.y,
-      }));
-    });
+    galleryRows().flatMap((row) =>
+      row.runs.flatMap(({ dir, seats: line }) => {
+        // Held off the centre line, where the two runs meet, and off the wall.
+        const usable = line.length - 1.2;
+        const count = Math.max(0, Math.floor(usable / p.GALLERY_SEAT_PITCH));
+        return Array.from({ length: count }, (_, seat) => {
+          const u = (0.5 + ((seat + 0.5) * usable) / count) / line.length;
+          const x = line.a[0] + (line.b[0] - line.a[0]) * u;
+          const z = line.a[1] + (line.b[1] - line.a[1]) * u;
+          return {
+            row: row.index,
+            seat,
+            angle: Math.atan2(x, z),
+            radius: Math.hypot(x, z),
+            // Faces square off its own row, not at the chair.
+            face: dir * REAR,
+            y: row.y,
+          };
+        });
+      })
+    );
 
-  const gallerySeatEstimate = () =>
-    galleryRows().reduce((total, row) => total + row.seats, 0);
+  const gallerySeatEstimate = () => gallerySeatPositions().length;
 
   // Floor and gallery together, against the count the room was actually fitted
   // with. This is the whole point of generating a room rather than placing it:
@@ -167,7 +292,11 @@ export function createPlan(p) {
   // The plane the eye may not cross. Behind the dais elevation is a crescent of
   // dead space between that flat wall and the cylinder — a room nobody has ever
   // been in, and the thing an unclamped sweep puts on screen.
-  const DAIS_PLANE = p.DAIS_WALL_Z + 0.4;
+  //
+  // Stood off the wall by more than the wall's own thickness: piers, a lintel
+  // and in the House a canopy all stand forward of it, and an eye swung round
+  // at their height would otherwise pass through them.
+  const DAIS_PLANE = p.DAIS_WALL_Z + 2.0;
 
   // How far the eye may get from what it is looking at.
   //
@@ -177,8 +306,24 @@ export function createPlan(p) {
   // keep the camera inside: it lets it out by however far the target is off
   // centre, and the curved wall is drawn BackSide, so from outside it is not
   // there at all.
-  const cameraReach = (target, margin = 1.5) =>
-    p.WALL_R - Math.hypot(target[0], target[2]) - margin;
+  //
+  // The balcony is a second fence inside the first. It used to be kept out of
+  // the way by standing it high; a room this size is deep enough that the eye,
+  // swung up at full reach, arrives at the balcony's front edge above its
+  // soffit all the same. Under the soffit the eye may go where it likes, so the
+  // limit is the reach at which, on reaching soffit height, it is still short
+  // of the nearest point of that edge.
+  const cameraReach = (target, margin = 1.5) => {
+    const off = Math.hypot(target[0], target[2]);
+    const up = BAND_Y - 0.5 - target[1];
+    return Math.min(p.WALL_R - off - margin, Math.hypot(GALLERY_NEAR - 0.5 - off, up));
+  };
+
+  // How high the eye may swing: at full reach it must still be under the
+  // ceiling. In a small room the reach is short enough that it always is, and
+  // the floor on this angle is just the one that stops the view going plan.
+  const cameraMinPolar = (target, reach, clear = 0.8, floor = 0.35) =>
+    Math.max(floor, Math.acos(Math.min(1, (p.WALL_H - clear - target[1]) / reach)));
 
   // How low the eye may swing. Far enough down to read the rake, not so far that
   // it drops into the back row: at full reach it must clear the desk top of the
@@ -211,11 +356,22 @@ export function createPlan(p) {
     FAN,
     HALF_FAN,
     BACK_WALL_HALF,
-    GALLERY_FAN,
+    FAR,
+    GALLERY_NEAR,
+    galleryFront,
+    walls,
+    onRun,
+    wallDistance,
+    BAND_Y,
+    FASCIA_TOP,
+    DAIS_MID,
     DAIS_PLANE,
+    aisleBearings,
+    aisleHalf,
     rows,
     rowBlocks,
     chairRadius,
+    CHAIR_REACH,
     seatPositions,
     floorSeatEstimate,
     galleryRows,
@@ -224,6 +380,7 @@ export function createPlan(p) {
     seatEstimate,
     speakingPlace,
     cameraReach,
+    cameraMinPolar,
     cameraMaxPolar,
     cameraHalfSweep,
   };

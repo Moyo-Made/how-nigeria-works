@@ -46,6 +46,7 @@ function interior(plan, palette, look, ground) {
     // its upholstery.
     minReach: plan.DAIS_R + 0.4,
     halfSweep: plan.cameraHalfSweep(look, reach, maxPolar),
+    minPolar: plan.cameraMinPolar(look, reach),
     maxPolar,
     radius: plan.WALL_R,
     height: plan.WALL_H,

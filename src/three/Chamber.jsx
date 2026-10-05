@@ -1,464 +1,154 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 import ChamberTiers from "./ChamberTiers.jsx";
 import ChamberBenches from "./ChamberBenches.jsx";
+import ChamberDais from "./ChamberDais.jsx";
+import ChamberElevation from "./ChamberElevation.jsx";
 import ChamberFocus from "./ChamberFocus.jsx";
 import ChamberGallery from "./ChamberGallery.jsx";
-import CurvedDesk from "./CurvedDesk.jsx";
+import ChamberSideWalls from "./ChamberSideWalls.jsx";
 import { useChamber } from "./chamberContext.js";
 
 // A chamber of the National Assembly. One component draws either of them.
 //
-// The Senate and the House are mirror-image halls of one design and their dais
-// photography matches element for element, which is what makes a single
-// component defensible: what differs between the rooms is their size and the
-// colour of the dyed wool, and both of those arrive through context. Building
-// the Green Chamber as its own file would have meant maintaining two copies of
-// one room and discovering the divergence only by looking at both.
+// The case for one component is what the contractor's photographs of the two
+// renovated rooms show when set side by side: the same chairs, the same curved
+// oak desks, the same dais furniture piece for piece — clerks' table, mace
+// cradle, the two baize parapets stepping down from the chair
+// (ChamberDais.jsx) — and the same timbers and backlit panels on the walls. Those are drawn once, sized by each
+// room's plan and coloured by its palette.
+// https://figueras.com/project/national-assembly-of-nigeria/
+//
+// What the photographs do not show is two copies of one room. The wall behind
+// the chair is a different composition in each, so each has its own elevation
+// (ChamberElevation.jsx), chosen by the plan. An earlier version of this file
+// said the two dais walls matched element for element and drew the Senate's
+// from the House's photographs; they do not, and it no longer does.
 //
 // The chamber the app models is the one rebuilt in 2024, not the one in most
 // photographs of it. The old concrete tier was demolished outright and the
 // seats, desks, carpet and acoustic walls all replaced, so anything shot before
-// April 2024 is a different room. Where an element below is sourced from the
-// House chamber rather than the Senate, the comment says so: the two are
-// mirror-image halls of one design and their dais photographs match element for
-// element, which is what makes the substitution defensible — and it is also the
-// single largest piece of inference in this model.
+// April 2024 is a different room.
 
 const WALL_SEGMENTS = 96;
 
 // Three.js puts cylinder theta 0 on +Z and sweeps toward +X, which is the
 // convention the whole room is laid out in: the dais wall is at -Z, the seating
-// fans toward +Z, and every arc shares a centre on the wall.
-const arcStart = (halfAngle) => -halfAngle;
+// fans toward +Z, and every arc of the seating shares a centre on the wall.
 
-// The acoustic wall either side of the dais is a few hundred battens. As
-// separate meshes that is a few hundred draw calls for a surface nobody ever
-// looks at straight on.
-function Fluting({ x, z, width, height, y = 0, pitch = 0.17 }) {
-  const { palette } = useChamber();
-  const ref = useRef();
-  const count = Math.max(1, Math.floor(width / pitch));
+// The shell: a wide flat wall behind the chair (ChamberElevation.jsx draws what
+// stands on it), a wall down each side and two across the rear. The plan says
+// where they are; see the note on the walls in chamberPlan.
+//
+// Timber to the band line and white plaster above it, under a white ceiling:
+// every photograph of either renovated room shows that, and none shows the dark
+// ceiling this used to have. The plaster carries a row of dark square grilles
+// part-way up, on every wall of both rooms.
+const GRILLE = 0.55;
+const GRILLE_PITCH = 2.6;
 
-  useLayoutEffect(() => {
-    const matrix = new THREE.Matrix4();
-    for (let i = 0; i < count; i++) {
-      matrix.setPosition(x - width / 2 + pitch / 2 + i * pitch, y + height / 2, z);
-      ref.current.setMatrixAt(i, matrix);
-    }
-    ref.current.instanceMatrix.needsUpdate = true;
-  }, [count, pitch, width, height, x, y, z]);
+function Grilles({ length, skip = 0 }) {
+  const { plan, palette } = useChamber();
+  const { BAND_Y, WALL_H } = plan;
+  const count = Math.floor(length / GRILLE_PITCH);
 
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, count]} castShadow receiveShadow>
-      <boxGeometry args={[pitch * 0.5, height, 0.14]} />
-      <meshStandardMaterial {...palette.oakPale} />
-    </instancedMesh>
-  );
+  return Array.from({ length: count }, (_, i) => -length / 2 + (i + 0.5) * (length / count))
+    .filter((x) => Math.abs(x) >= skip)
+    .map((x) => (
+      <mesh key={x} position={[x, BAND_Y + (WALL_H - BAND_Y) * 0.55, 0.02]}>
+        <boxGeometry args={[GRILLE, GRILLE, 0.03]} />
+        <meshStandardMaterial {...palette.screen} />
+      </mesh>
+    ));
 }
 
-// The emblem is a rendered texture, not geometry. An eagle, two horses and a
-// wreath do not reduce to primitives at any sane triangle count — the earlier
-// attempt read as an arrow flanked by two white tubes. Extruding real vector art
-// was the other option and it is worse: the published SVGs of the arms run to
-// 226 paths and 380 KB of path data, which becomes hundreds of thousands of
-// triangles for something read at a couple of hundred pixels on screen.
-//
-// The master is tools/emblems/coat-of-arms.svg, drawn for this project so no
-// third-party licence rides along with it. `npm run emblems` renders it.
-function CoatOfArms({ size = 2.75 }) {
-  const [texture, setTexture] = useState(null);
+// What the ceiling carries, which differs between the rooms; see CEILING in
+// each plan. Both are lit surfaces, not lamps: the light in the room comes from
+// ChamberRig, and these are what it would be coming out of.
+const LIT = { color: "#f6f8fb", emissive: "#ffffff", emissiveIntensity: 0.9, roughness: 0.9 };
 
-  // Loaded imperatively rather than through a suspending hook. Suspense would
-  // hold the entire chamber back behind one image — and worse, it left the room
-  // blank indefinitely here rather than resolving. The emblem is a detail of a
-  // wall; the wall should not wait for it.
-  useEffect(() => {
-    let live = true;
-    new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}textures/coat-of-arms.png`, (map) => {
-      if (!live) {
-        map.dispose();
-        return;
+function Ceiling() {
+  const { CEILING, WALL_H, WALL_R } = useChamber().plan;
+
+  if (CEILING === "lantern") {
+    return (
+      <mesh position={[0, WALL_H - 0.04, WALL_R * 0.45]} rotation={[Math.PI / 2, 0, Math.PI / 8]}>
+        <circleGeometry args={[WALL_R * 0.4, 8]} />
+        <meshStandardMaterial {...LIT} side={THREE.DoubleSide} />
+      </mesh>
+    );
+  }
+
+  if (CEILING === "panels") {
+    const pitch = 5.5;
+    const reach = Math.floor(WALL_R / pitch);
+    const spots = [];
+    for (let i = -reach; i <= reach; i++) {
+      for (let j = 0; j <= reach; j++) {
+        const x = i * pitch;
+        const z = (j + 0.5) * pitch;
+        if (Math.hypot(x, z) < WALL_R - 2) spots.push([x, z]);
       }
-      map.colorSpace = THREE.SRGBColorSpace;
-      // Read from the floor of the House at a steep angle, which is exactly
-      // where an unfiltered texture goes to mush.
-      map.anisotropy = 8;
-      setTexture(map);
-    });
-    return () => {
-      live = false;
-    };
-  }, []);
+    }
+    return spots.map(([x, z]) => (
+      <mesh key={`${x}:${z}`} position={[x, WALL_H - 0.03, z]} rotation={[Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.2, 1.2]} />
+        <meshStandardMaterial {...LIT} side={THREE.DoubleSide} />
+      </mesh>
+    ));
+  }
 
-  useEffect(() => () => texture?.dispose(), [texture]);
-
-  if (!texture) return null;
-
-  return (
-    <mesh>
-      <planeGeometry args={[size, size]} />
-      {/* alphaTest rather than plain transparency: the emblem sits against a
-          wall it must not sort behind, and a cutout has no ordering to get
-          wrong. */}
-      <meshStandardMaterial
-        map={texture}
-        transparent
-        alphaTest={0.35}
-        roughness={0.58}
-        metalness={0.04}
-      />
-    </mesh>
-  );
+  return null;
 }
 
-// Composition confirmed against dais photography of both chambers: a central
-// book-matched bay carrying the arms, a narrow reddish pilaster to either side,
-// pale fluted acoustic panelling outboard of those, charcoal panels at high
-// level, and a door at the base of each fluted bay.
-function DaisWall() {
-  const { plan, palette } = useChamber();
-  const { BACK_WALL_HALF, WALL_H, WALL_R } = plan;
-
-  // The panelled elevation is a composition in its own right, not cladding run
-  // wall to wall: it stops short of the curved wall either side, which is what
-  // the reference shows and what keeps the doors and the fluted bays inside the
-  // frame from anywhere on the floor.
-  //
-  // Its proportions are fractions of the room rather than fixed widths, so the
-  // same composition holds in a chamber half again as wide. The doors are the
-  // exception and stay in metres: a door is the size of a person either way.
-  const half = WALL_R * 0.625;
-  const panelTop = WALL_H * 0.643;
-  const bayHalf = WALL_R * 0.258;
-  const pilaster = WALL_R * 0.055;
-  const flutedInner = bayHalf + pilaster * 2;
-  const flutedWidth = half - flutedInner;
-  const flutedMid = flutedInner + flutedWidth / 2;
-
-  return (
-    <group position={[0, 0, -0.5]}>
-      {/* The flat wall itself runs the full width of the D — the panelling in
-          front of it does not — so the dais end of the room stays closed. */}
-      <mesh position={[0, WALL_H / 2, -0.12]} receiveShadow>
-        <boxGeometry args={[BACK_WALL_HALF * 2, WALL_H, 0.24]} />
-        <meshStandardMaterial {...palette.oakPale} />
-      </mesh>
-
-      {/* central book-matched bay */}
-      <mesh position={[0, panelTop / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[bayHalf * 2, panelTop, 0.16]} />
-        <meshStandardMaterial {...palette.bay} />
-      </mesh>
-
-      {/* pilasters */}
-      {[-1, 1].map((dir) => (
-        <mesh
-          key={dir}
-          position={[dir * (bayHalf + pilaster), panelTop / 2, 0.03]}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry args={[pilaster * 2, panelTop, 0.22]} />
-          <meshStandardMaterial {...palette.oak} />
-        </mesh>
-      ))}
-
-      {/* fluted acoustic bays, and the charcoal panels above them */}
-      {[-1, 1].map((dir) => (
-        <group key={dir}>
-          <mesh position={[dir * flutedMid, panelTop / 2, -0.04]} receiveShadow>
-            <boxGeometry args={[flutedWidth, panelTop, 0.1]} />
-            <meshStandardMaterial {...palette.oakPale} />
-          </mesh>
-          <Fluting x={dir * flutedMid} z={0.04} width={flutedWidth} height={panelTop} />
-          <mesh position={[dir * flutedMid, panelTop + 1.1, 0]} receiveShadow>
-            <boxGeometry args={[flutedWidth, 2.0, 0.12]} />
-            <meshStandardMaterial {...palette.charcoal} />
-          </mesh>
-        </group>
-      ))}
-
-      {/* a door at the base of each fluted bay, flanking the dais */}
-      {[-1, 1].map((dir) => (
-        <mesh key={dir} position={[dir * flutedMid, 1.35, 0.14]} castShadow>
-          <boxGeometry args={[1.7, 2.7, 0.12]} />
-          <meshStandardMaterial {...palette.oak} />
-        </mesh>
-      ))}
-
-      <group position={[0, WALL_H * 0.443, 0.14]}>
-        <CoatOfArms size={WALL_R * 0.215} />
-      </group>
-    </group>
-  );
-}
-
-// The presiding chair, its platform, and the curved baize desk in front of it.
-// The desk is a partial cylinder concentric with everything else in the room, so
-// it faces the benches by construction.
-// A desk sits about this far above the seat it is worked at, and the presiding
-// chair's pad sits this far above the platform. Both live here rather than
-// inside the two components that need them, because the desk height is derived
-// from the seat height and the two silently disagreeing is exactly the fault
-// this replaces: the desk stood 1.05 m above the platform against a seat 0.48 m
-// up, which put its top 0.57 m above the seat — near enough double a desk, and
-// the President of the Senate at a surface near chin height.
-const CHAIR_SEAT = 0.48;
-const DESK_OVER_SEAT = 0.3;
-
-function Dais() {
-  const { plan, palette } = useChamber();
-  const { DAIS_R, DAIS_LIFT, HALF_FAN } = plan;
-  const deskH = CHAIR_SEAT + DESK_OVER_SEAT;
-  const platformHalf = HALF_FAN * 0.42;
-
-  return (
-    <group>
-      {/* raised platform */}
-      <mesh position={[0, DAIS_LIFT / 2, 0]} castShadow receiveShadow>
-        <cylinderGeometry
-          args={[DAIS_R + 0.9, DAIS_R + 0.9, DAIS_LIFT, 48, 1, false, arcStart(platformHalf), platformHalf * 2]}
-        />
-        <meshStandardMaterial {...palette.oak} />
-      </mesh>
-
-      {/* two steps up to the platform, so the dais is stood on rather than
-          floating above the carpet */}
-      {[0, 1].map((i) => {
-        // Each tread rises from the carpet rather than from the one below it, so
-        // the risers stack without the lower step sinking through the floor.
-        const rise = DAIS_LIFT * (0.5 + i * 0.5);
-        const radius = DAIS_R + 1.16 - i * 0.2;
-        return (
-          <mesh key={i} position={[0, rise / 2, 0]} receiveShadow castShadow>
-            <cylinderGeometry
-              args={[radius, radius, rise, 48, 1, false, arcStart(platformHalf * 0.94), platformHalf * 1.88]}
-            />
-            <meshStandardMaterial {...palette.oakShade} />
-          </mesh>
-        );
-      })}
-
-      <CurvedDesk
-        radius={DAIS_R}
-        halfAngle={platformHalf * 0.82}
-        height={deskH}
-        depth={0.44}
-        lip={0.16}
-        y={DAIS_LIFT}
-        face={palette.baize}
-        back={palette.oakShade}
-        top={palette.oak}
-      />
-      <mesh position={[0, DAIS_LIFT + deskH + 0.22, 0]}>
-        <cylinderGeometry
-          args={[DAIS_R + 0.16, DAIS_R + 0.16, 0.05, 32, 1, true, arcStart(platformHalf * 0.82), platformHalf * 1.64]}
-        />
-        <meshStandardMaterial {...palette.brass} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* roundel on the desk front. In the Senate this reads "The President of
-          the Senate"; the House carries the identical fitting lettered for the
-          Speaker. Lettering is left off rather than faked at this resolution. */}
-      <mesh position={[0, DAIS_LIFT + deskH * 0.55, DAIS_R + 0.02]} castShadow>
-        <cylinderGeometry args={[0.34, 0.34, 0.04, 32]} />
-        <meshStandardMaterial {...palette.brass} />
-      </mesh>
-
-      <PresidingChair />
-    </group>
-  );
-}
-
-function PresidingChair() {
-  const { plan, palette } = useChamber();
-  const { DAIS_LIFT, DAIS_R } = plan;
-  const seat = DAIS_LIFT + CHAIR_SEAT;
-
-  return (
-    <group position={[0, 0, DAIS_R - 1.5]}>
-      <mesh position={[0, seat, 0]} castShadow>
-        <boxGeometry args={[0.82, 0.16, 0.72]} />
-        <meshStandardMaterial {...palette.baize} />
-      </mesh>
-      {/* A tall upholstered back rising well above the desk, so the chair still
-          reads as the seat of the chair from the floor of the House. */}
-      <mesh position={[0, seat + 0.78, -0.32]} castShadow>
-        <boxGeometry args={[0.86, 1.42, 0.18]} />
-        <meshStandardMaterial {...palette.baize} />
-      </mesh>
-      <mesh position={[0, seat + 1.56, -0.32]} castShadow>
-        <boxGeometry args={[0.86, 0.24, 0.22]} />
-        <meshStandardMaterial {...palette.oak} />
-      </mesh>
-      {/* the coat-of-arms roundel set into the headrest */}
-      <mesh position={[0, seat + 1.22, -0.22]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.19, 0.19, 0.03, 24]} />
-        <meshStandardMaterial {...palette.brass} />
-      </mesh>
-      {[-1, 1].map((dir) => (
-        <mesh key={dir} position={[dir * 0.46, seat + 0.24, 0]} castShadow>
-          <boxGeometry args={[0.1, 0.36, 0.62]} />
-          <meshStandardMaterial {...palette.oak} />
-        </mesh>
-      ))}
-      <mesh position={[0, seat - 0.26, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.38, 0.5]} />
-        <meshStandardMaterial {...palette.oak} />
-      </mesh>
-    </group>
-  );
-}
-
-// The mace: roughly three feet, gold, the coat of arms at its head. It is not
-// ornament — the Senate cannot validly sit without it, and the Sergeant-at-Arms
-// carries it in ahead of the President of the Senate to open the sitting. Which
-// is why it is modelled as an object in its own right rather than a detail of
-// the table, and why the bill sequence will be able to address it.
-//
-// Built along Y because that is the axis every cylinder here is native to, then
-// laid on its side, the way it rests on the table between sittings.
-function Mace({ length = 0.92, lit = false }) {
-  const { palette } = useChamber();
-  const BRASS = palette.brass;
-  const shaft = length * 0.58;
-  // Lit, it is the same brass with the light turned up inside it rather than a
-  // different object. The mace is the one thing in this room whose presence is
-  // itself the fact being taught, so it has to read as the same mace.
-  const brass = lit
-    ? { ...BRASS, emissive: "#c9931f", emissiveIntensity: 0.85, toneMapped: false }
-    : BRASS;
-
-  return (
-    <group rotation={[0, 0, Math.PI / 2]}>
-      <mesh castShadow>
-        <cylinderGeometry args={[length * 0.026, length * 0.032, shaft, 16]} />
-        <meshStandardMaterial {...brass} />
-      </mesh>
-
-      {/* collars breaking up the shaft */}
-      {[-0.28, 0.06].map((t) => (
-        <mesh key={t} position={[0, shaft * t, 0]} castShadow>
-          <cylinderGeometry args={[length * 0.042, length * 0.042, length * 0.028, 16]} />
-          <meshStandardMaterial {...brass} />
-        </mesh>
-      ))}
-
-      {/* head: bulb, crown and the arms on top */}
-      <mesh position={[0, shaft * 0.5 + length * 0.05, 0]} castShadow>
-        <sphereGeometry args={[length * 0.062, 20, 14]} />
-        <meshStandardMaterial {...brass} />
-      </mesh>
-      <mesh position={[0, shaft * 0.5 + length * 0.125, 0]} castShadow>
-        <cylinderGeometry args={[length * 0.055, length * 0.038, length * 0.07, 16, 1, true]} />
-        <meshStandardMaterial {...brass} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, shaft * 0.5 + length * 0.18, 0]} castShadow>
-        <sphereGeometry args={[length * 0.03, 14, 10]} />
-        <meshStandardMaterial {...brass} />
-      </mesh>
-
-      {/* tapered foot */}
-      <mesh position={[0, -shaft * 0.5 - length * 0.06, 0]} castShadow>
-        <coneGeometry args={[length * 0.032, length * 0.12, 16]} />
-        <meshStandardMaterial {...brass} />
-      </mesh>
-    </group>
-  );
-}
-
-// Directly below and in front of the dais: oak, with a baize inset top and the
-// brass stanchions that cradle the mace.
-function ClerksTable({ maceLit }) {
-  const { plan, palette } = useChamber();
-  const { CLERKS_R } = plan;
-  const height = 0.78;
-  const depth = 0.8;
-  const halfAngle = 0.26;
-  const maceY = height + 0.115;
-
-  return (
-    <group>
-      <CurvedDesk
-        radius={CLERKS_R}
-        halfAngle={halfAngle}
-        height={height}
-        depth={depth}
-        lip={0.07}
-        face={palette.oak}
-        back={palette.oakShade}
-        top={palette.oak}
-        segments={32}
-      />
-
-      {/* baize inset, sitting just proud of the oak surround */}
-      <mesh position={[0, height + 0.013, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry
-          args={[
-            CLERKS_R - depth + 0.13,
-            CLERKS_R - 0.13,
-            32,
-            1,
-            -halfAngle * 0.86 - Math.PI / 2,
-            halfAngle * 1.72,
-          ]}
-        />
-        <meshStandardMaterial {...palette.baize} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* the cradle: two stanchions with saddles, and the mace across them */}
-      {[-1, 1].map((dir) => (
-        <group key={dir} position={[dir * 0.34, 0, CLERKS_R - 0.06]}>
-          <mesh position={[0, height + 0.055, 0]} castShadow>
-            <cylinderGeometry args={[0.022, 0.03, 0.11, 12]} />
-            <meshStandardMaterial {...palette.brass} />
-          </mesh>
-          <mesh position={[0, height + 0.115, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-            <torusGeometry args={[0.036, 0.011, 8, 16, Math.PI]} />
-            <meshStandardMaterial {...palette.brass} />
-          </mesh>
-        </group>
-      ))}
-
-      <group position={[0, maceY, CLERKS_R - 0.06]}>
-        <Mace lit={maceLit} />
-      </group>
-    </group>
-  );
-}
-
-// D-plan: a curved wall wrapping the seating, closed at the dais end by the flat
-// panelled elevation. The curved wall is drawn from the inside, so it is a
-// single open-ended cylinder with its faces flipped rather than a solid.
 function Shell() {
   const { plan, palette } = useChamber();
-  const { WALL_H, WALL_R } = plan;
+  const { BACK_WALL_HALF, BAND_Y, DAIS_WALL_Z, FAR, WALL_H, walls } = plan;
 
   return (
     <group>
-      <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[WALL_R, WALL_SEGMENTS]} />
+      {/* The floor and the ceiling are discs wide enough to reach every corner.
+          What lies outside the walls is never seen from inside them. */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[FAR + 1, WALL_SEGMENTS]} />
         <meshStandardMaterial {...palette.carpet} />
       </mesh>
-
-      <mesh position={[0, WALL_H / 2, 0]}>
-        <cylinderGeometry args={[WALL_R, WALL_R, WALL_H, WALL_SEGMENTS, 1, true]} />
-        <meshStandardMaterial {...palette.oakPale} side={THREE.BackSide} />
-      </mesh>
-
       <mesh position={[0, WALL_H, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[WALL_R, WALL_SEGMENTS]} />
-        <meshStandardMaterial {...palette.charcoal} side={THREE.DoubleSide} />
+        <circleGeometry args={[FAR + 1, WALL_SEGMENTS]} />
+        <meshStandardMaterial {...palette.plaster} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* a plain skirt around the base of the curved wall, so the carpet does
-          not run straight into the panelling */}
-      <mesh position={[0, 0.22, 0]}>
-        <cylinderGeometry args={[WALL_R - 0.02, WALL_R - 0.02, 0.44, WALL_SEGMENTS, 1, true]} />
-        <meshStandardMaterial {...palette.oak} side={THREE.BackSide} />
-      </mesh>
+      <Ceiling />
+
+      {walls().map((wall) => (
+        <group
+          key={`${wall.kind}${wall.dir}`}
+          position={[wall.mid[0], 0, wall.mid[1]]}
+          rotation={[0, wall.bearing + Math.PI, 0]}
+        >
+          <mesh position={[0, BAND_Y / 2, 0]} receiveShadow>
+            <planeGeometry args={[wall.length, BAND_Y]} />
+            <meshStandardMaterial {...palette.oakPale} />
+          </mesh>
+          <mesh position={[0, (BAND_Y + WALL_H) / 2, 0]} receiveShadow>
+            <planeGeometry args={[wall.length, WALL_H - BAND_Y]} />
+            <meshStandardMaterial {...palette.plaster} />
+          </mesh>
+          {/* a plain skirt along the foot of the wall, so the carpet does not
+              run straight into the panelling */}
+          <mesh position={[0, 0.22, 0.16]}>
+            <boxGeometry args={[wall.length, 0.44, 0.04]} />
+            <meshStandardMaterial {...palette.oak} />
+          </mesh>
+          <Grilles length={wall.length} />
+        </group>
+      ))}
+
+      {/* the grilles on the wall behind the chair, clear of whatever stands in
+          the middle of it */}
+      <group position={[0, 0, DAIS_WALL_Z]}>
+        <Grilles length={BACK_WALL_HALF * 2} skip={BAND_Y * 1.2} />
+      </group>
     </group>
   );
 }
@@ -467,12 +157,12 @@ export default function Chamber({ highlight = null, ...props }) {
   return (
     <group {...props}>
       <Shell />
+      <ChamberSideWalls />
       <ChamberTiers />
       <ChamberGallery />
       <ChamberBenches />
-      <DaisWall />
-      <Dais />
-      <ClerksTable maceLit={highlight === "mace"} />
+      <ChamberElevation />
+      <ChamberDais maceLit={highlight === "mace"} />
       <ChamberFocus highlight={highlight} />
     </group>
   );

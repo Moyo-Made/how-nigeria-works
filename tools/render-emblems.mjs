@@ -41,12 +41,31 @@ if (!chrome) {
 
 // Square, power-of-two, and generous enough that the emblem still holds up when
 // a viewer walks the camera right up to the dais wall.
-const EMBLEMS = [{ source: "coat-of-arms.svg", name: "coat-of-arms.png", size: 1024 }];
+const EMBLEMS = [
+  { source: "coat-of-arms.svg", name: "coat-of-arms.png", size: 1024 },
+  { source: "seal-house.svg", name: "seal-house.png", size: 1024 },
+  { source: "seal-senate.svg", name: "seal-senate.png", size: 1024 },
+];
+
+// Both chambers' seals carry the arms, and the arms have one master. So a seal
+// names it with <include href x y width height /> rather than holding a copy,
+// and it is inlined here as a nested <svg> placed in that box — a copy pasted
+// into each seal would be three drawings of the arms free to drift apart.
+const inline = (svg) =>
+  svg.replace(
+    /<include href="([^"]+)" x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"\s*\/>/g,
+    (_, href, x, y, width, height) =>
+      readFileSync(resolve(root, "tools/emblems", href), "utf8").replace(
+        /<svg\b([^>]*)>/,
+        (_, attrs) =>
+          `<svg${attrs.replace(/\s(width|height)="[^"]*"/g, "")} x="${x}" y="${y}" width="${width}" height="${height}">`,
+      ),
+  );
 
 mkdirSync(outDir, { recursive: true });
 
 for (const { source, name, size } of EMBLEMS) {
-  const svg = readFileSync(resolve(root, "tools/emblems", source), "utf8");
+  const svg = inline(readFileSync(resolve(root, "tools/emblems", source), "utf8"));
   const page = join(tmpdir(), `three-arms-emblem-${name}.html`);
 
   // The emblem is drawn wider than it is tall, so it is letterboxed into a
@@ -58,7 +77,7 @@ for (const { source, name, size } of EMBLEMS) {
 <style>
   html, body { margin: 0; padding: 0; background: transparent; }
   body { width: ${size}px; height: ${size}px; display: grid; place-items: center; }
-  svg { display: block; width: ${size}px; height: auto; }
+  body > svg { display: block; width: ${size}px; height: auto; }
 </style>
 ${svg}`,
   );

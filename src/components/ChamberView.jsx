@@ -64,7 +64,9 @@ export default function ChamberView({ id }) {
 
   const [stage, setStage] = useState(null);
   const [playing, setPlaying] = useState(false);
-  const sitting = stage !== null;
+  // A room with no sequence is never sitting, whatever stage the last room
+  // left behind: the reset below runs after the first render of the new one.
+  const sitting = stages !== null && stage !== null;
 
   // Changing room ends whatever the last one was in the middle of.
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function ChamberView({ id }) {
 
   if (!interior) return <NoRoom chamber={chamber} id={id} />;
 
-  const { Component, plan, palette, eye, look, fov, reach, minReach, halfSweep, maxPolar } =
+  const { Component, plan, palette, eye, look, fov, reach, minReach, halfSweep, minPolar, maxPolar } =
     interior;
   const { radius, height, floorSeats, gallerySeats, seats, ground } = interior;
 
@@ -154,7 +156,7 @@ export default function ChamberView({ id }) {
             maxDistance={reach}
             minAzimuthAngle={-halfSweep}
             maxAzimuthAngle={halfSweep}
-            minPolarAngle={0.35}
+            minPolarAngle={minPolar}
             maxPolarAngle={maxPolar}
             enableDamping
             dampingFactor={0.06}

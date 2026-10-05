@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
-import { SeatPart } from "./ChamberBenches.jsx";
+import { HEADREST_H, HEADREST_W, HEADREST_Y, HEADREST_Z, SeatPart } from "./ChamberBenches.jsx";
+import { doors } from "./chamberDoors.js";
 import { useChamber } from "./chamberContext.js";
 
 // What the sitting sequence points at.
@@ -31,20 +32,16 @@ const GLOW = {
 // front of them hides it. The division lit all 171 places and read as a faint
 // scatter of gold behind the benches.
 //
-// So the marker is the cap along the top of the chair back instead — the one
-// part of a chair that stays legible from the far side of the chamber, which is
-// exactly why ChamberBenches gives it an oak cap in the first place. Lighting a
-// place now means that cap glowing, at the same offsets, so a lit chair is the
+// So the marker is the headrest instead — the one part of a chair that stays
+// legible from the far side of the chamber. Lighting a place means that pad
+// glowing, at the same offsets ChamberBenches puts it, so a lit chair is the
 // chair rather than something hovering near it.
-const CAP_SET = -0.11;
-const RAKE = -0.09;
-
 function Places({ seats }) {
-  const { SEAT_H, SEAT_PITCH } = useChamber().plan;
+  const { SEAT_H } = useChamber().plan;
 
   return (
-    <SeatPart seats={seats} dy={SEAT_H + 0.59} dz={CAP_SET} tilt={RAKE}>
-      <boxGeometry args={[SEAT_PITCH * 0.76 + 0.05, 0.08, 0.135]} />
+    <SeatPart seats={seats} dy={SEAT_H + HEADREST_Y} dz={HEADREST_Z + 0.01} tilt={-0.12}>
+      <boxGeometry args={[HEADREST_W + 0.06, HEADREST_H + 0.05, 0.14]} />
       <meshStandardMaterial {...GLOW} />
     </SeatPart>
   );
@@ -58,13 +55,12 @@ const world = (seat) => [
 
 export default function ChamberFocus({ highlight }) {
   const { plan } = useChamber();
-  const { seatPositions, speakingPlace, WALL_R } = plan;
+  const { seatPositions, speakingPlace } = plan;
   const place = useMemo(() => speakingPlace(), [speakingPlace]);
   const floor = useMemo(() => seatPositions(), [seatPositions]);
-  // The doors sit in the panelled elevation either side of the dais, and that
-  // elevation is a fraction of the wall rather than a fixed width — so in a
-  // bigger chamber they are further apart.
-  const doorX = WALL_R * 0.5;
+  // The doors sit in the elevation either side of the dais, in a different
+  // place in each room, so the elevation is asked where it put them.
+  const doorX = doors(plan).x;
 
   if (highlight === "member") {
     const [x, y, z] = world(place);
