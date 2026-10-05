@@ -12,6 +12,7 @@ import ContentPanel from "./ContentPanel.jsx";
 import StageControls from "./StageControls.jsx";
 import BillPlayer from "./BillPlayer.jsx";
 import billStages from "../data/billToLaw.json";
+import { useSequence } from "../hooks/useSequence.js";
 
 const STEP_AZIMUTH = Math.PI / 6;
 const STEP_DOLLY = Math.log(1.3);
@@ -26,11 +27,10 @@ export default function SpecimenView({ institution, playRequest, onPlayAnimation
   const [view, setView] = useState(IDLE);
   const [openId, setOpenId] = useState(null);
   const [canExplode, setCanExplode] = useState(false);
-  const [stage, setStage] = useState(null);
-  const [playing, setPlaying] = useState(false);
 
   const stages = ANIMATIONS[animation] ?? null;
-  const animating = stage !== null;
+  const seq = useSequence(stages);
+  const { active: animating, start, exit: exitSequence, reset: resetSequence } = seq;
 
   const model = useRef();
   const controls = useRef();
@@ -46,9 +46,8 @@ export default function SpecimenView({ institution, playRequest, onPlayAnimation
     pending.current = { azimuth: 0, dolly: 0 };
     setView(IDLE);
     setOpenId(null);
-    setStage(null);
-    setPlaying(false);
-  }, [id]);
+    resetSequence();
+  }, [id, resetSequence]);
 
   // The toolbar and the card below the well both ask for the animation by
   // bumping a counter, so either can start it without owning its state.
@@ -56,17 +55,15 @@ export default function SpecimenView({ institution, playRequest, onPlayAnimation
     if (!playRequest || !stages) return;
     setView(IDLE);
     setOpenId(null);
-    setStage(0);
-    setPlaying(true);
-  }, [playRequest, stages]);
+    start();
+  }, [playRequest, stages, start]);
 
   const exit = useCallback(() => {
-    setStage(null);
-    setPlaying(false);
+    exitSequence();
     // The animation drove the camera directly, so hand it back where it started.
     controls.current?.reset();
     pending.current = { azimuth: 0, dolly: 0 };
-  }, []);
+  }, [exitSequence]);
 
   useEffect(() => {
     if (!openId && !animating) return;
@@ -99,18 +96,6 @@ export default function SpecimenView({ institution, playRequest, onPlayAnimation
     pending.current = { azimuth: 0, dolly: 0 };
     setView(IDLE);
     setOpenId(null);
-  };
-
-  const clamp = (i) => Math.max(0, Math.min(stages.length - 1, i));
-  const step = (next) => {
-    setStage(clamp(next));
-    setPlaying(false);
-  };
-  // Relative moves go through the updater: two quick taps on Next both read the
-  // same rendered index otherwise, and the second one is lost.
-  const nudgeStage = (delta) => {
-    setStage((s) => clamp(s + delta));
-    setPlaying(false);
   };
 
   const annotated = !isolate && !exploded && !animating;
@@ -155,9 +140,9 @@ export default function SpecimenView({ institution, playRequest, onPlayAnimation
               {animating && (
                 <BillAnimation
                   stages={stages}
-                  index={stage}
-                  playing={playing}
-                  onAdvance={() => setStage((s) => s + 1)}
+                  index={seq.index}
+                  playing={seq.playing && !seq.asking}
+                  onAdvance={seq.advance}
                 />
               )}
 
@@ -195,11 +180,14 @@ export default function SpecimenView({ institution, playRequest, onPlayAnimation
           {animating ? (
             <BillPlayer
               stages={stages}
-              index={stage}
-              playing={playing}
-              onStep={step}
-              onNudge={nudgeStage}
-              onPlayPause={() => setPlaying((p) => !p)}
+              index={seq.index}
+              playing={seq.playing}
+              asking={seq.asking}
+              answered={seq.done}
+              onStep={seq.step}
+              onNudge={seq.nudge}
+              onPlayPause={seq.togglePlay}
+              onAnswered={seq.markAnswered}
               onExit={exit}
             />
           ) : (

@@ -859,7 +859,7 @@ button.ecard:hover {
 }
 
 .track-stop:hover circle {
-  stroke: var(--paper);
+  stroke: var(--on-well);
 }
 
 .track-stop[data-state="done"] circle {
@@ -868,8 +868,8 @@ button.ecard:hover {
 }
 
 .track-stop[data-state="current"] circle {
-  fill: var(--paper);
-  stroke: var(--paper);
+  fill: var(--on-well);
+  stroke: var(--on-well);
 }
 
 .track-label {
@@ -899,7 +899,7 @@ button.ecard:hover {
 
 .player-buttons .tool:hover:not(:disabled) {
   background: var(--well-line);
-  color: var(--paper);
+  color: var(--on-well);
 }
 
 .player-buttons .tool:disabled {

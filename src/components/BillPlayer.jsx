@@ -1,3 +1,5 @@
+import QuickCheck from "./QuickCheck.jsx";
+
 const W = 560;
 const H = 44;
 
@@ -32,9 +34,21 @@ function geometry(count) {
   return { stops, upper, lower, single, joinX, right };
 }
 
-export default function BillPlayer({ stages, index, playing, onStep, onNudge, onPlayPause, onExit }) {
+export default function BillPlayer({
+  stages,
+  index,
+  playing,
+  asking,
+  answered,
+  onStep,
+  onNudge,
+  onPlayPause,
+  onAnswered,
+  onExit,
+}) {
   const stage = stages[index];
   const last = index === stages.length - 1;
+  const pending = Boolean(stage.check) && !answered;
   const { stops, upper, lower, single, joinX, right } = geometry(stages.length);
 
   // How far the flow has travelled, as a fraction of the single course after
@@ -44,11 +58,18 @@ export default function BillPlayer({ stages, index, playing, onStep, onNudge, on
 
   return (
     <div className="player">
-      <div className="player-caption" role="status" aria-live="polite">
-        <p className="eyebrow">{last ? "Last stage" : `Next · ${stages[index + 1].title}`}</p>
-        <h2>{stage.title}</h2>
-        <p>{stage.caption}</p>
-      </div>
+      {asking ? (
+        <QuickCheck key={stage.id} check={stage.check} onAnswered={onAnswered} />
+      ) : (
+        <div className="player-caption" role="status" aria-live="polite">
+          <p className="eyebrow">{last ? "Last stage" : `Next · ${stages[index + 1].title}`}</p>
+          <h2>{stage.title}</h2>
+          <p>
+            {stage.caption}
+            {stage.source && <cite className="fact-source">{stage.source}</cite>}
+          </p>
+        </div>
+      )}
 
       <svg className="track" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
         <path className="track-channel" d={upper} />
@@ -90,14 +111,19 @@ export default function BillPlayer({ stages, index, playing, onStep, onNudge, on
 
       <div className="player-buttons">
         <div className="tool-group">
-          <button className="tool" onClick={() => onNudge(-1)} disabled={index === 0}>
+          <button className="tool" onClick={() => onNudge(-1)} disabled={index === 0 && !asking}>
             Back
           </button>
-          <button className="tool" onClick={onPlayPause} disabled={last && !playing} data-on={playing || undefined}>
+          <button
+            className="tool"
+            onClick={onPlayPause}
+            disabled={(last && !playing) || asking}
+            data-on={playing || undefined}
+          >
             {playing ? "Pause" : last ? "Finished" : "Play"}
           </button>
-          <button className="tool" onClick={() => onNudge(1)} disabled={last}>
-            Next
+          <button className="tool" onClick={() => onNudge(1)} disabled={last && !pending && !asking}>
+            {asking ? (answered ? (last ? "Done" : "Continue") : "Skip") : "Next"}
           </button>
         </div>
         <div className="tool-group">

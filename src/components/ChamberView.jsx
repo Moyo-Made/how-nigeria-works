@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
@@ -9,6 +9,7 @@ import { getInterior } from "../three/chamberRegistry.js";
 import { getChamber } from "../data/chambers.js";
 import { getInstitution } from "../data/institutions.js";
 import { toInstitution } from "../hooks/useHashRoute.js";
+import { useSequence } from "../hooks/useSequence.js";
 import SittingPlayer from "./SittingPlayer.jsx";
 import sittingStages from "../data/chamberSitting.json";
 import houseSittingStages from "../data/chamberSittingHouse.json";
@@ -65,30 +66,13 @@ export default function ChamberView({ id }) {
   const interior = chamber?.status === "complete" ? getInterior(id) : null;
   const stages = ANIMATIONS[chamber?.animation] ?? null;
 
-  const [stage, setStage] = useState(null);
-  const [playing, setPlaying] = useState(false);
-  // A stage with a check stops to ask it before moving on. `asking` is the
-  // question being on screen; `answered` remembers which stages have been
-  // settled, so going back over one does not ask it twice.
-  const [asking, setAsking] = useState(false);
-  const [answered, setAnswered] = useState(() => new Set());
-  // A room with no sequence is never sitting, whatever stage the last room
-  // left behind: the reset below runs after the first render of the new one.
-  const sitting = stages !== null && stage !== null;
+  const seq = useSequence(stages);
+  const { active: sitting, current, exit, reset } = seq;
 
   // Changing room ends whatever the last one was in the middle of.
   useEffect(() => {
-    setStage(null);
-    setPlaying(false);
-    setAsking(false);
-    setAnswered(new Set());
-  }, [id]);
-
-  const exit = useCallback(() => {
-    setStage(null);
-    setPlaying(false);
-    setAsking(false);
-  }, []);
+    reset();
+  }, [id, reset]);
 
   useEffect(() => {
     if (!sitting) return;
@@ -102,48 +86,6 @@ export default function ChamberView({ id }) {
   const { Component, plan, palette, eye, look, fov, reach, minReach, halfSweep, minPolar, maxPolar } =
     interior;
   const { radius, height, floorSeats, gallerySeats, seats, ground } = interior;
-
-  const current = sitting ? stages[stage] : null;
-  const clamp = (i) => Math.max(0, Math.min(stages.length - 1, i));
-  const last = sitting && stage === stages.length - 1;
-  const done = sitting && answered.has(current.id);
-  const pending = Boolean(current?.check) && !done;
-
-  const step = (next) => {
-    setStage(clamp(next));
-    setPlaying(false);
-    setAsking(false);
-  };
-  // Relative moves go through the updater: two quick taps on Next both read the
-  // same rendered index otherwise, and the second one is lost.
-  const nudge = (delta) => {
-    // Forward off a stage that still owes its question stops to ask it. Forward
-    // again — answered or not — moves on, so the check can be skipped but not
-    // missed. Leaving a question this way keeps the sequence playing if it was.
-    if (delta > 0 && pending && !asking) {
-      setAsking(true);
-      return;
-    }
-    if (delta > 0 && asking) {
-      setAsking(false);
-      setStage((s) => clamp(s + delta));
-      return;
-    }
-    // Back from a question returns to the caption it was asked about.
-    if (delta < 0 && asking) {
-      setAsking(false);
-      setPlaying(false);
-      return;
-    }
-    setStage((s) => clamp(s + delta));
-    setPlaying(false);
-  };
-  // What the sequence does when a stage has had its time.
-  const advance = () => {
-    if (pending) setAsking(true);
-    else if (!last) setStage((s) => s + 1);
-    else setPlaying(false);
-  };
 
   return (
     <div className="stage-col">
@@ -170,9 +112,9 @@ export default function ChamberView({ id }) {
               <ChamberSitting
                 fov={fov}
                 stages={stages}
-                index={stage}
-                playing={playing && !asking}
-                onAdvance={advance}
+                index={seq.index}
+                playing={seq.playing && !seq.asking}
+                onAdvance={seq.advance}
               />
             )}
           </ChamberContext.Provider>
@@ -206,14 +148,14 @@ export default function ChamberView({ id }) {
         {sitting ? (
           <SittingPlayer
             stages={stages}
-            index={stage}
-            playing={playing}
-            asking={asking}
-            answered={done}
-            onStep={step}
-            onNudge={nudge}
-            onPlayPause={() => setPlaying((p) => !p)}
-            onAnswered={() => setAnswered((set) => new Set(set).add(current.id))}
+            index={seq.index}
+            playing={seq.playing}
+            asking={seq.asking}
+            answered={seq.done}
+            onStep={seq.step}
+            onNudge={seq.nudge}
+            onPlayPause={seq.togglePlay}
+            onAnswered={seq.markAnswered}
             onExit={exit}
           />
         ) : (
@@ -233,10 +175,7 @@ export default function ChamberView({ id }) {
                 <span className="tool-spacer" />
                 <button
                   className="cta"
-                  onClick={() => {
-                    setStage(0);
-                    setPlaying(true);
-                  }}
+                  onClick={seq.start}
                 >
                   <span className="cta-play" aria-hidden="true" />
                   Watch a sitting

@@ -9,7 +9,18 @@
       0.78
     ],
     "azimuth": 0.15,
-    "distance": 5.4
+    "distance": 5.4,
+    "check": {
+      "question": "In which chamber may a bill begin?",
+      "options": [
+        "Only the Senate",
+        "Only the House of Representatives",
+        "Either one"
+      ],
+      "answer": 2,
+      "explain": "A bill may originate in either the Senate or the House of Representatives.",
+      "source": "s. 58(2)"
+    }
   },
   {
     "id": "first-reading",
@@ -81,7 +92,18 @@
       0.04
     ],
     "azimuth": 0.6,
-    "distance": 4.6
+    "distance": 4.6,
+    "check": {
+      "question": "One chamber has passed the bill. What has to happen before it can go to the President?",
+      "options": [
+        "Nothing — one chamber is enough",
+        "The other chamber must pass it, and the two must agree on any amendment",
+        "A joint sitting of both chambers must vote on it"
+      ],
+      "answer": 1,
+      "explain": "A bill passed by the chamber it started in is sent to the other. It is presented to the President only when that chamber has passed it too and the two have agreed on any amendment.",
+      "source": "s. 58(3)"
+    }
   },
   {
     "id": "harmonisation",
@@ -105,7 +127,18 @@
       0.85
     ],
     "azimuth": 0.95,
-    "distance": 6.2
+    "distance": 6.2,
+    "check": {
+      "question": "How long does the President have to assent or withhold assent?",
+      "options": [
+        "Fourteen days",
+        "Thirty days",
+        "Ninety days"
+      ],
+      "answer": 1,
+      "explain": "Once a bill is presented, the President has thirty days to signify either assent or the withholding of it.",
+      "source": "s. 58(4)"
+    }
   },
   {
     "id": "law",
@@ -117,6 +150,17 @@
       0.16
     ],
     "azimuth": 0.15,
-    "distance": 5.6
+    "distance": 5.6,
+    "check": {
+      "question": "Assent is withheld. What does it take to make the bill law anyway?",
+      "options": [
+        "A simple majority in each chamber",
+        "A two-thirds majority in each chamber",
+        "Nothing — a refusal is final"
+      ],
+      "answer": 1,
+      "explain": "If the bill is passed again by each chamber by a two-thirds majority, it becomes law and the President's assent is not required.",
+      "source": "s. 58(5)"
+    }
   }
 ]
