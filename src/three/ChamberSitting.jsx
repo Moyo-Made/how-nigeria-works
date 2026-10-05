@@ -43,7 +43,6 @@ export default function ChamberSitting({ stages, index, playing, fov, onAdvance 
   const { speakingPlace } = useChamber().plan;
   const place = useMemo(() => speakingPlace(), [speakingPlace]);
   const stage = stages[index];
-  const last = index === stages.length - 1;
 
   useEffect(() => {
     elapsed.current = 0;
@@ -76,11 +75,17 @@ export default function ChamberSitting({ stages, index, playing, fov, onAdvance 
     camera.position.copy(offset.setFromSpherical(spherical).add(o.target));
     camera.lookAt(o.target);
 
-    if (playing && !last) {
+    if (playing) {
       // Clamped: a backgrounded tab hands back one enormous delta on return,
       // which would otherwise skip several stages in a single frame.
       elapsed.current += Math.min(delta, 0.1);
-      if (elapsed.current >= STAGE_SECONDS) onAdvance();
+      // What happens next is the view's call — move on, stop to ask the
+      // stage's question, or finish — so this only says the time is up, and
+      // says it once.
+      if (elapsed.current >= STAGE_SECONDS) {
+        elapsed.current = 0;
+        onAdvance();
+      }
     }
   });
 

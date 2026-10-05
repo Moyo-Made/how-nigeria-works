@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
+import Marker from "../components/Marker.jsx";
 import { getChamber } from "../data/chambers.js";
 import { preloadInterior } from "./chamberRegistry.js";
 import { toChamber } from "../hooks/useHashRoute.js";
@@ -17,9 +18,9 @@ const direction = new THREE.Vector3();
 const CHECK_EVERY = 4;
 
 // A hotspot that names a room the app models offers a door into it. The link
-// belongs on the card rather than on the marker: the marker is a numbered
-// annotation on the outside of a building, and turning some of them into
-// doorways and not others would make the numbering mean two things at once.
+// belongs on the card rather than on the marker: the marker is a name on the
+// outside of a building, and turning some of them into doorways and not others
+// would make a name mean two things at once.
 //
 // The unbuilt chamber is still offered, the way the rail still lists an unbuilt
 // institution — the reader learns the room exists and why it is not here yet,
@@ -79,14 +80,11 @@ function Hotspot({ hotspot, index, open, occludes, onOpen, onClose }) {
           onPointerUp={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            className="hotspot-dot"
+          <Marker
+            hotspot={hotspot}
+            open={open}
             onClick={() => (open ? onClose() : onOpen(hotspot.id))}
-            aria-expanded={open}
-            aria-label={hotspot.label}
-          >
-            {index + 1}
-          </button>
+          />
 
           {open && (
             <div className="hotspot-card" role="dialog" aria-label={hotspot.label}>

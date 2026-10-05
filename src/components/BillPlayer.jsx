@@ -45,9 +45,7 @@ export default function BillPlayer({ stages, index, playing, onStep, onNudge, on
   return (
     <div className="player">
       <div className="player-caption" role="status" aria-live="polite">
-        <p className="eyebrow">
-          Stage {index + 1} of {stages.length}
-        </p>
+        <p className="eyebrow">{last ? "Last stage" : `Next · ${stages[index + 1].title}`}</p>
         <h2>{stage.title}</h2>
         <p>{stage.caption}</p>
       </div>
@@ -81,7 +79,7 @@ export default function BillPlayer({ stages, index, playing, onStep, onNudge, on
             onClick={() => onStep(i)}
             role="button"
             tabIndex={0}
-            aria-label={`Stage ${i + 1}: ${stages[i].title}`}
+            aria-label={stages[i].title}
             aria-current={i === index || undefined}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onStep(i)}
           >

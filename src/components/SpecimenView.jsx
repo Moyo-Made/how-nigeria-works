@@ -206,7 +206,7 @@ export default function SpecimenView({ institution, playRequest, onPlayAnimation
             <p className="stage-tip">
               {exploded
                 ? "Separated into its parts"
-                : "Drag to rotate · Scroll to zoom · Tap a number to read about it"}
+                : "Drag to rotate · Scroll to zoom · Tap a name to read about it"}
             </p>
           )}
         </div>

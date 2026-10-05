@@ -10,6 +10,7 @@ import ContentPanel from "./components/ContentPanel.jsx";
 // Keeps three.js out of the first paint entirely.
 const SpecimenView = lazy(() => import("./components/SpecimenView.jsx"));
 const ChamberView = lazy(() => import("./components/ChamberView.jsx"));
+const Styleguide = lazy(() => import("./components/Styleguide.jsx"));
 
 const FIRST = institutions.find((i) => i.status === "complete");
 
@@ -46,6 +47,7 @@ function NotBuilt({ institution }) {
 export default function App() {
   const { route, id } = useHashRoute();
   const inChamber = route === "chamber";
+  const inStyleguide = route === "styleguide";
   // Inside a chamber the rail still points at the building the room is in. You
   // are in the National Assembly when you are in the Senate, and the highlight
   // saying so is also the way back out.
@@ -58,8 +60,8 @@ export default function App() {
   const [playRequest, setPlayRequest] = useState(0);
 
   useEffect(() => {
-    if (!id) toInstitution(FIRST.id);
-  }, [id]);
+    if (!id && !inStyleguide) toInstitution(FIRST.id);
+  }, [id, inStyleguide]);
 
   return (
     <div className="shell">
@@ -77,33 +79,39 @@ export default function App() {
         </span>
       </header>
 
-      <div className="workspace">
-        <Rail currentId={institution.id} />
+      {inStyleguide ? (
+        <Suspense fallback={null}>
+          <Styleguide />
+        </Suspense>
+      ) : (
+        <div className="workspace">
+          <Rail currentId={institution.id} />
 
-        {inChamber ? (
-          <Suspense fallback={<StagePlaceholder label="Preparing the chamber…" />}>
-            <ChamberView id={id} />
-          </Suspense>
-        ) : built ? (
-          <Suspense fallback={<StagePlaceholder label="Preparing the model…" />}>
-            <SpecimenView
-              institution={institution}
-              playRequest={playRequest}
-              onPlayAnimation={() => setPlayRequest((n) => n + 1)}
-            />
-          </Suspense>
-        ) : (
-          <>
-            <div className="stage-col">
-              <NotBuilt institution={institution} />
-              <div className="toolbar" />
-            </div>
-            <ContentPanel institution={institution} />
-          </>
-        )}
-      </div>
+          {inChamber ? (
+            <Suspense fallback={<StagePlaceholder label="Preparing the chamber…" />}>
+              <ChamberView id={id} />
+            </Suspense>
+          ) : built ? (
+            <Suspense fallback={<StagePlaceholder label="Preparing the model…" />}>
+              <SpecimenView
+                institution={institution}
+                playRequest={playRequest}
+                onPlayAnimation={() => setPlayRequest((n) => n + 1)}
+              />
+            </Suspense>
+          ) : (
+            <>
+              <div className="stage-col">
+                <NotBuilt institution={institution} />
+                <div className="toolbar" />
+              </div>
+              <ContentPanel institution={institution} />
+            </>
+          )}
+        </div>
+      )}
 
-      {built && !inChamber && (
+      {built && !inChamber && !inStyleguide && (
         <ExploreCards
           institution={institution}
           onPlayAnimation={() => setPlayRequest((n) => n + 1)}

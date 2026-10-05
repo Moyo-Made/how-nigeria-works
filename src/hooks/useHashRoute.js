@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 // putting one in the rail would misstate the shape of government the rail exists
 // to show.
 const parse = (hash) => {
+  // Not a place in the app: the design system laid out for whoever is working
+  // on it. Nothing links here, so it is only ever reached by typing it.
+  if (/^#\/styleguide\b/.test(hash)) return { route: "styleguide", id: null };
+
   const chamber = hash.match(/^#\/c\/([\w-]+)/);
   if (chamber) return { route: "chamber", id: chamber[1] };
 

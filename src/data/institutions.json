@@ -56,6 +56,7 @@
         "id": "senate",
         "interior": "senate",
         "label": "The Senate (Red Chamber)",
+        "short": "Senate",
         "blurb": "109 senators. Every state sends three, regardless of size, so a small state has the same voice here as a large one. The Red Chamber is inside the central building, on the eastern side of the atrium.",
         "position": [
           -0.34,
@@ -67,6 +68,7 @@
         "id": "house",
         "interior": "house",
         "label": "House of Representatives (Green Chamber)",
+        "short": "House",
         "blurb": "360 members elected from federal constituencies drawn by population, so busier areas hold more seats. The Green Chamber is in the same central building, on the western side of the atrium.",
         "position": [
           0.34,
@@ -77,6 +79,7 @@
       {
         "id": "dome",
         "label": "The Green Dome",
+        "short": "Green Dome",
         "blurb": "The landmark of the complex. Beneath it runs the central atrium that both chambers open onto — which is why the whole National Assembly is pictured by this one roof.",
         "position": [
           0,
@@ -87,6 +90,7 @@
       {
         "id": "wings",
         "label": "The wing buildings",
+        "short": "Wings",
         "blurb": "Two five-storey wings flank the domed building, added years after it, giving the Senate and the House the offices and workrooms the chambers themselves have no space for.",
         "position": [
           0.56,
@@ -154,6 +158,7 @@
       {
         "id": "presidents-office",
         "label": "The President's Office",
+        "short": "President's Office",
         "blurb": "Where the President works, and where a bill arrives from the National Assembly to be assented to — or not.",
         "position": [
           -0.41,
@@ -184,6 +189,7 @@
       {
         "id": "forecourt",
         "label": "The Forecourt",
+        "short": "Forecourt",
         "blurb": "Where visiting heads of state are formally received, and where national ceremonies are held.",
         "position": [
           0,
@@ -258,6 +264,7 @@
       {
         "id": "courtroom",
         "label": "The courtroom",
+        "short": "Courtroom",
         "blurb": "Where the Justices sit as a panel to hear appeals. No witnesses and no new evidence — only argument about what the law means. Each Justice may give their own reasons, and the view of the majority binds every other court.",
         "position": [
           0,
@@ -268,6 +275,7 @@
       {
         "id": "coat-of-arms",
         "label": "The Coat of Arms",
+        "short": "Coat of Arms",
         "blurb": "Mounted above the entrance, marking the court as an institution of the Federal Republic rather than of any government of the day.",
         "position": [
           0,
@@ -278,6 +286,7 @@
       {
         "id": "forecourt",
         "label": "Forecourt and Steps",
+        "short": "Forecourt",
         "blurb": "The public approach to the court — the point at which a dispute stops being political and becomes a legal question.",
         "position": [
           0,

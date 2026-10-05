@@ -4,17 +4,51 @@
     "title": "The mace is laid",
     "caption": "The House cannot validly sit without it. The Sergeant-at-Arms carries the mace in ahead of the Speaker and lays it on the table, and only then is the chamber in session. Take it off the table and whatever happens next is not a sitting.",
     "highlight": "mace",
-    "target": [0, 0.95, 5.66],
+    "target": [
+      0,
+      0.95,
+      5.66
+    ],
     "azimuth": 0.28,
     "polar": 0.8,
     "distance": 2.8
+  },
+  {
+    "id": "quorum",
+    "title": "A quorum is present",
+    "caption": "Before the House can decide anything, enough of its members have to be in the room. The Constitution sets that number at one-third of all the members — for a chamber of 360, that is 120.",
+    "source": "s. 54(1)",
+    "highlight": null,
+    "target": [
+      0,
+      1.9,
+      5.0
+    ],
+    "azimuth": 0.3,
+    "polar": 1.18,
+    "distance": 12.0,
+    "check": {
+      "question": "How many of the 360 members make a quorum?",
+      "options": [
+        "All 360",
+        "More than half — 181",
+        "One-third — 120"
+      ],
+      "answer": 2,
+      "explain": "The quorum of either chamber is one-third of all its members, which for 360 works out at 120.",
+      "source": "s. 54(1)"
+    }
   },
   {
     "id": "first-reading",
     "title": "First Reading",
     "caption": "The Clerk reads the bill's title to the chamber. Nothing is debated and nothing is voted on — this stage exists only to put the bill formally before the House.",
     "highlight": "dais",
-    "target": [0, 1.75, 1.6],
+    "target": [
+      0,
+      1.75,
+      1.6
+    ],
     "azimuth": 0.18,
     "polar": 1.15,
     "distance": 9.8
@@ -33,7 +67,11 @@
     "title": "Committee Stage",
     "caption": "The chamber rises and the bill goes to a committee, which takes it apart line by line and can rewrite it. None of that work happens in this room — which is why most of what the National Assembly does is invisible from the gallery.",
     "highlight": "empty",
-    "target": [0, 2.3, 5.9],
+    "target": [
+      0,
+      2.3,
+      5.9
+    ],
     "azimuth": 0.42,
     "polar": 1.05,
     "distance": 13.5
@@ -43,7 +81,11 @@
     "title": "Report Stage",
     "caption": "The committee reports back and the chamber works through what it recommends, settling the wording the bill will carry from here on.",
     "highlight": null,
-    "target": [0, 1.9, 5.0],
+    "target": [
+      0,
+      1.9,
+      5.0
+    ],
     "azimuth": -0.3,
     "polar": 1.18,
     "distance": 12.0
@@ -53,19 +95,49 @@
     "title": "Third Reading, and the vote",
     "caption": "The final vote. The House has 360 members, one for each federal constituency, and the constituencies are shared out among the states by population — so Lagos and Kano send twenty-four each and Bayelsa five. The Senate counts states; this room counts people.",
     "highlight": "division",
-    "target": [0, 2.0, 6.5],
+    "target": [
+      0,
+      2.0,
+      6.5
+    ],
     "azimuth": 0.2,
     "polar": 1.0,
-    "distance": 17.5
+    "distance": 17.5,
+    "check": {
+      "question": "The vote is tied. What does the Speaker do?",
+      "options": [
+        "Nothing — a tied bill fails",
+        "Casts the deciding vote",
+        "Orders the vote to be taken again"
+      ],
+      "answer": 1,
+      "explain": "Questions are decided by a simple majority of the members present and voting. Whoever is presiding votes only to break a tie, and in no other case.",
+      "source": "s. 56"
+    }
   },
   {
     "id": "transmitted",
     "title": "It leaves the room",
     "caption": "The bill has cleared this chamber. It is still not law: it goes out through those doors to the Senate, which puts it through every one of these stages again — and both chambers must pass the same text.",
     "highlight": "doors",
-    "target": [-4.7, 1.9, 0.4],
+    "target": [
+      -4.7,
+      1.9,
+      0.4
+    ],
     "azimuth": -0.75,
     "polar": 1.3,
-    "distance": 4.8
+    "distance": 4.8,
+    "check": {
+      "question": "Both chambers pass the bill and the President refuses to sign it. Can it still become law?",
+      "options": [
+        "No — a refusal ends it",
+        "Yes — if each chamber passes it again by a two-thirds majority",
+        "Yes — automatically, after thirty days"
+      ],
+      "answer": 1,
+      "explain": "The President has thirty days to assent or withhold assent. If assent is withheld and each chamber passes the bill again by a two-thirds majority, it becomes law without it.",
+      "source": "s. 58(4)–(5)"
+    }
   }
 ]

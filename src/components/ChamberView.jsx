@@ -67,6 +67,11 @@ export default function ChamberView({ id }) {
 
   const [stage, setStage] = useState(null);
   const [playing, setPlaying] = useState(false);
+  // A stage with a check stops to ask it before moving on. `asking` is the
+  // question being on screen; `answered` remembers which stages have been
+  // settled, so going back over one does not ask it twice.
+  const [asking, setAsking] = useState(false);
+  const [answered, setAnswered] = useState(() => new Set());
   // A room with no sequence is never sitting, whatever stage the last room
   // left behind: the reset below runs after the first render of the new one.
   const sitting = stages !== null && stage !== null;
@@ -75,11 +80,14 @@ export default function ChamberView({ id }) {
   useEffect(() => {
     setStage(null);
     setPlaying(false);
+    setAsking(false);
+    setAnswered(new Set());
   }, [id]);
 
   const exit = useCallback(() => {
     setStage(null);
     setPlaying(false);
+    setAsking(false);
   }, []);
 
   useEffect(() => {
@@ -97,15 +105,44 @@ export default function ChamberView({ id }) {
 
   const current = sitting ? stages[stage] : null;
   const clamp = (i) => Math.max(0, Math.min(stages.length - 1, i));
+  const last = sitting && stage === stages.length - 1;
+  const done = sitting && answered.has(current.id);
+  const pending = Boolean(current?.check) && !done;
+
   const step = (next) => {
     setStage(clamp(next));
     setPlaying(false);
+    setAsking(false);
   };
   // Relative moves go through the updater: two quick taps on Next both read the
   // same rendered index otherwise, and the second one is lost.
   const nudge = (delta) => {
+    // Forward off a stage that still owes its question stops to ask it. Forward
+    // again — answered or not — moves on, so the check can be skipped but not
+    // missed. Leaving a question this way keeps the sequence playing if it was.
+    if (delta > 0 && pending && !asking) {
+      setAsking(true);
+      return;
+    }
+    if (delta > 0 && asking) {
+      setAsking(false);
+      setStage((s) => clamp(s + delta));
+      return;
+    }
+    // Back from a question returns to the caption it was asked about.
+    if (delta < 0 && asking) {
+      setAsking(false);
+      setPlaying(false);
+      return;
+    }
     setStage((s) => clamp(s + delta));
     setPlaying(false);
+  };
+  // What the sequence does when a stage has had its time.
+  const advance = () => {
+    if (pending) setAsking(true);
+    else if (!last) setStage((s) => s + 1);
+    else setPlaying(false);
   };
 
   return (
@@ -134,8 +171,8 @@ export default function ChamberView({ id }) {
                 fov={fov}
                 stages={stages}
                 index={stage}
-                playing={playing}
-                onAdvance={() => setStage((s) => s + 1)}
+                playing={playing && !asking}
+                onAdvance={advance}
               />
             )}
           </ChamberContext.Provider>
@@ -171,9 +208,12 @@ export default function ChamberView({ id }) {
             stages={stages}
             index={stage}
             playing={playing}
+            asking={asking}
+            answered={done}
             onStep={step}
             onNudge={nudge}
             onPlayPause={() => setPlaying((p) => !p)}
+            onAnswered={() => setAnswered((set) => new Set(set).add(current.id))}
             onExit={exit}
           />
         ) : (
